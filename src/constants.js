@@ -1,11 +1,16 @@
 // Input
-export const KEY_LEFT = 37
-export const KEY_RIGHT = 39
-export const KEY_UP = 38
-export const KEY_DOWN = 40
-export const KEY_ROTATE_CCW = 90
-export const KEY_ROTATE_CW = 88
-export const KEY_HOLD = 16
+export const MOVE_LEFT = 37 // left
+export const MOVE_RIGHT = 39 // right
+export const HARD_DROP = 32 // space
+export const SOFT_DROP = 40 // down
+export const ROTATE_CCW = 90 // X
+export const ROTATE_CW = 88 // Z
+export const HOLD = 16 // shift
+export const INPUT_MAPPING = {
+    38: ROTATE_CW, // up
+    67: HOLD, // C
+    17: ROTATE_CCW // Ctrl
+}
 
 export const TETROMINO_I = 1
 export const TETROMINO_J = 2
@@ -31,3 +36,8 @@ export const AUTO_SHIFT_DELAY = 12
 export const AUTO_REPEAT_DELAY = 2
 export const LOCK_DELAY = 30
 export const MAX_LOCK_RESET_COUNT = 14
+
+
+
+export const T_SPIN_MINI = 1
+export const T_SPIN = 2

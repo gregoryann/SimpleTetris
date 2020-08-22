@@ -15,7 +15,7 @@ exports.generateImage = generateImage;
 exports.renderSolidSquare = renderSolidSquare;
 exports.makeColorWithAlpha = makeColorWithAlpha;
 exports.waitForNextFrame = waitForNextFrame;
-exports.debug = debug;
+exports.zeroPad = zeroPad;
 exports.forRectangularRegion = exports.getCellY = exports.getCellX = void 0;
 
 var _constants = require("./constants");
@@ -180,6 +180,12 @@ function waitForNextFrame() {
  */
 
 
-function debug(thing) {
-  console.log(_globals.frame, thing);
+function zeroPad(str, n) {
+  str = str.toString();
+
+  if (str.length > n) {
+    return Array(str.length).fill(9).join('');
+  }
+
+  return Array(n - str.length).fill(0).join('') + str;
 }

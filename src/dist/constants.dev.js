@@ -3,22 +3,38 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.MAX_LOCK_RESET_COUNT = exports.LOCK_DELAY = exports.AUTO_REPEAT_DELAY = exports.AUTO_SHIFT_DELAY = exports.TILE_SIZE = exports.COLORS = exports.TETROMINO_Z = exports.TETROMINO_T = exports.TETROMINO_S = exports.TETROMINO_O = exports.TETROMINO_L = exports.TETROMINO_J = exports.TETROMINO_I = exports.KEY_HOLD = exports.KEY_ROTATE_CW = exports.KEY_ROTATE_CCW = exports.KEY_DOWN = exports.KEY_UP = exports.KEY_RIGHT = exports.KEY_LEFT = void 0;
+exports.T_SPIN = exports.T_SPIN_MINI = exports.MAX_LOCK_RESET_COUNT = exports.LOCK_DELAY = exports.AUTO_REPEAT_DELAY = exports.AUTO_SHIFT_DELAY = exports.TILE_SIZE = exports.COLORS = exports.TETROMINO_Z = exports.TETROMINO_T = exports.TETROMINO_S = exports.TETROMINO_O = exports.TETROMINO_L = exports.TETROMINO_J = exports.TETROMINO_I = exports.INPUT_MAPPING = exports.HOLD = exports.ROTATE_CW = exports.ROTATE_CCW = exports.SOFT_DROP = exports.HARD_DROP = exports.MOVE_RIGHT = exports.MOVE_LEFT = void 0;
 // Input
-var KEY_LEFT = 37;
-exports.KEY_LEFT = KEY_LEFT;
-var KEY_RIGHT = 39;
-exports.KEY_RIGHT = KEY_RIGHT;
-var KEY_UP = 38;
-exports.KEY_UP = KEY_UP;
-var KEY_DOWN = 40;
-exports.KEY_DOWN = KEY_DOWN;
-var KEY_ROTATE_CCW = 90;
-exports.KEY_ROTATE_CCW = KEY_ROTATE_CCW;
-var KEY_ROTATE_CW = 88;
-exports.KEY_ROTATE_CW = KEY_ROTATE_CW;
-var KEY_HOLD = 16;
-exports.KEY_HOLD = KEY_HOLD;
+var MOVE_LEFT = 37; // left
+
+exports.MOVE_LEFT = MOVE_LEFT;
+var MOVE_RIGHT = 39; // right
+
+exports.MOVE_RIGHT = MOVE_RIGHT;
+var HARD_DROP = 32; // space
+
+exports.HARD_DROP = HARD_DROP;
+var SOFT_DROP = 40; // down
+
+exports.SOFT_DROP = SOFT_DROP;
+var ROTATE_CCW = 90; // X
+
+exports.ROTATE_CCW = ROTATE_CCW;
+var ROTATE_CW = 88; // Z
+
+exports.ROTATE_CW = ROTATE_CW;
+var HOLD = 16; // shift
+
+exports.HOLD = HOLD;
+var INPUT_MAPPING = {
+  38: ROTATE_CW,
+  // up
+  67: HOLD,
+  // C
+  17: ROTATE_CCW // Ctrl
+
+};
+exports.INPUT_MAPPING = INPUT_MAPPING;
 var TETROMINO_I = 1;
 exports.TETROMINO_I = TETROMINO_I;
 var TETROMINO_J = 2;
@@ -45,3 +61,7 @@ var LOCK_DELAY = 30;
 exports.LOCK_DELAY = LOCK_DELAY;
 var MAX_LOCK_RESET_COUNT = 14;
 exports.MAX_LOCK_RESET_COUNT = MAX_LOCK_RESET_COUNT;
+var T_SPIN_MINI = 1;
+exports.T_SPIN_MINI = T_SPIN_MINI;
+var T_SPIN = 2;
+exports.T_SPIN = T_SPIN;
