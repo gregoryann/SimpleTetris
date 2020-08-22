@@ -20,6 +20,15 @@ export class Tetromino {
         this.rotation = (this.rotation + 3) % 4
     }
 
+    getId() {
+        // abstract function
+    }
+
+    getColor() {
+        // abstract function
+    }
+
+
     getBlockPositions() {
         // abstract function
     }
