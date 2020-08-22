@@ -1,4 +1,4 @@
-# SimpleTetris
+# Tetris
 HTML5 and JavaScript Game
 
 
