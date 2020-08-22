@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TILE_SIZE = exports.COLORS = exports.TETROMINO_Z = exports.TETROMINO_T = exports.TETROMINO_S = exports.TETROMINO_O = exports.TETROMINO_L = exports.TETROMINO_J = exports.TETROMINO_I = exports.KEY_HOLD = exports.KEY_ROTATE_CW = exports.KEY_ROTATE_CCW = exports.KEY_DOWN = exports.KEY_UP = exports.KEY_RIGHT = exports.KEY_LEFT = void 0;
+exports.MAX_LOCK_RESET_COUNT = exports.LOCK_DELAY = exports.AUTO_REPEAT_DELAY = exports.AUTO_SHIFT_DELAY = exports.TILE_SIZE = exports.COLORS = exports.TETROMINO_Z = exports.TETROMINO_T = exports.TETROMINO_S = exports.TETROMINO_O = exports.TETROMINO_L = exports.TETROMINO_J = exports.TETROMINO_I = exports.KEY_HOLD = exports.KEY_ROTATE_CW = exports.KEY_ROTATE_CCW = exports.KEY_DOWN = exports.KEY_UP = exports.KEY_RIGHT = exports.KEY_LEFT = void 0;
 // Input
 var KEY_LEFT = 37;
 exports.KEY_LEFT = KEY_LEFT;
@@ -37,3 +37,11 @@ var COLORS = [, '#0ff', '#00f', '#f80', '#ff0', '#0f0', '#909', '#f00'];
 exports.COLORS = COLORS;
 var TILE_SIZE = 16;
 exports.TILE_SIZE = TILE_SIZE;
+var AUTO_SHIFT_DELAY = 12;
+exports.AUTO_SHIFT_DELAY = AUTO_SHIFT_DELAY;
+var AUTO_REPEAT_DELAY = 2;
+exports.AUTO_REPEAT_DELAY = AUTO_REPEAT_DELAY;
+var LOCK_DELAY = 30;
+exports.LOCK_DELAY = LOCK_DELAY;
+var MAX_LOCK_RESET_COUNT = 14;
+exports.MAX_LOCK_RESET_COUNT = MAX_LOCK_RESET_COUNT;
