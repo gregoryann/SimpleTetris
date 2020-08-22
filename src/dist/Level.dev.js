@@ -63,6 +63,7 @@ function () {
 
     this.tileCountX = 10;
     this.tileCountY = 20;
+    this.time = 0;
     this.board = new _Board.Board(this.tileCountX, this.tileCountY);
     this.width = _constants.TILE_SIZE * this.tileCountX;
     this.height = _constants.TILE_SIZE * this.tileCountY;
@@ -77,6 +78,7 @@ function () {
     (0, _globals.resetScore)();
     (0, _globals.resetLineClears)();
     this.scoreAnimations = [];
+    _Graphics.Graphics.lineWidth = 2;
   }
 
   _createClass(Level, [{
@@ -132,6 +134,8 @@ function () {
         this.gameOverAnimation.step();
         return;
       }
+
+      this.time++;
 
       if (_Input.Input.getKeyDown(_constants.HOLD) && !this.controller.wasHeld) {
         this.holdTetromino();
@@ -197,30 +201,24 @@ function () {
 
       _Graphics.Graphics.translate((_Graphics.Canvas.width - width) / 2, (_Graphics.Canvas.height - height) / 2);
 
-      _Graphics.Graphics.fillStyle = '#fff';
+      _Graphics.Graphics.strokeStyle = '#fff';
 
-      _Graphics.Graphics.fillRect(-2, -2, width + 4, height + 4);
-
-      _Graphics.Graphics.fillStyle = '#000';
-
-      _Graphics.Graphics.fillRect(0, 0, width, height);
+      _Graphics.Graphics.strokeRect(-1, -1, width + 2, height + 2);
 
       this.renderBoard();
 
       _Graphics.Graphics.translate(width + 25, 0);
 
-      _Graphics.Graphics.fillStyle = '#000';
-      _Graphics.Graphics.lineWidth = 2;
-      _Graphics.Graphics.strokeStyle = '#fff';
+      _Graphics.Graphics.strokeRect(-16, -1, 48, 170);
 
-      _Graphics.Graphics.strokeRect(-16, 0, 48, 170);
-
-      (0, _fontUtils.drawText)("LEVEL:", -17, 190);
-      (0, _fontUtils.drawBoldText)("".concat((0, _utils.zeroPad)(_globals.currentLevel, 2)), -17, 197);
-      (0, _fontUtils.drawText)("LINES:", -17, 224);
-      (0, _fontUtils.drawBoldText)("".concat((0, _utils.zeroPad)(_globals.lineClears, 4)), -17, 231);
+      (0, _fontUtils.drawText)("TIME:", -17, 27 * 7);
+      (0, _fontUtils.drawBoldText)(this.getTimeText(), -17, 28 * 7);
+      (0, _fontUtils.drawText)("LEVEL:", -17, 30 * 7);
+      (0, _fontUtils.drawBoldText)((0, _utils.zeroPad)(_globals.currentLevel, 2), -17, 31 * 7);
+      (0, _fontUtils.drawText)("LINES:", -17, 33 * 7);
+      (0, _fontUtils.drawBoldText)((0, _utils.zeroPad)(_globals.lineClears, 4), -17, 34 * 7);
       (0, _fontUtils.drawText)("SCORE:", -17, 297);
-      (0, _fontUtils.drawBoldText)("".concat((0, _utils.zeroPad)(_globals.currentScore, 9)), -17, 309, 2);
+      (0, _fontUtils.drawBoldText)((0, _utils.zeroPad)(_globals.currentScore, 9), -17, 309, 2);
       var _iteratorNormalCompletion3 = true;
       var _didIteratorError3 = false;
       var _iteratorError3 = undefined;
@@ -228,7 +226,7 @@ function () {
       try {
         for (var _iterator3 = this.scoreAnimations[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
           var animation = _step3.value;
-          animation.render(20, 296);
+          animation.render(20, 294);
         }
       } catch (err) {
         _didIteratorError3 = true;
@@ -251,7 +249,9 @@ function () {
 
       _Graphics.Graphics.translate((_Graphics.Canvas.width - width) / 2 - 40, (_Graphics.Canvas.height - height) / 2 + 10);
 
-      (0, _fontUtils.drawBoldText)("HOLD", -8, -8);
+      _Graphics.Graphics.strokeRect(-17, -11, 48, 40);
+
+      (0, _fontUtils.drawBoldText)("HOLD", -6, -8);
 
       if (this.heldTetromino) {
         if (this.controller.wasHeld) {
@@ -631,6 +631,15 @@ function () {
       _Graphics.Graphics.fillStyle = '#000';
 
       _Graphics.Graphics.fillRect(x * size + 1, y * size + 1, size - 3, size - 3);
+    }
+  }, {
+    key: "getTimeText",
+    value: function getTimeText() {
+      var milliseconds = Math.floor(this.time / 60 % 1 * 100);
+      var seconds = Math.floor(this.time / 60);
+      var hours = Math.floor(seconds / 3600);
+      var minutes = Math.floor(seconds / 60);
+      return "".concat((0, _utils.zeroPad)(hours, 2), ":").concat((0, _utils.zeroPad)(minutes % 60, 2), ":").concat((0, _utils.zeroPad)(seconds % 60, 2), ".").concat((0, _utils.zeroPad)(milliseconds, 2));
     }
   }]);
 

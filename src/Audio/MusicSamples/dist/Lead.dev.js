@@ -12,7 +12,7 @@ function createEnvelope() {
 
   for (var i = 0; i <= 1000; i++) {
     var scale = 0.1 + 0.9 * Math.pow(1 - i / 1000, 6);
-    result.push([i / 1000, Math.random() * scale]);
+    result.push([i / 1000, (0, _SoundGeneration.sampleTriangle)(i % 4 / 4) * scale, 2]);
   }
 
   return result;

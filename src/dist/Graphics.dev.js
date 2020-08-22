@@ -3,6 +3,8 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.drawRectangle = drawRectangle;
+exports.drawRectangleOutline = drawRectangleOutline;
 exports.drawAt = drawAt;
 exports.drawSprite = drawSprite;
 exports.Graphics = exports.Canvas = void 0;
@@ -11,6 +13,16 @@ exports.Canvas = Canvas;
 var Graphics = Canvas.getContext('2d');
 exports.Graphics = Graphics;
 Graphics.imageSmoothingEnabled = false;
+
+function drawRectangle(x, y, width, height, color) {
+  Graphics.fillStyle = color;
+  Graphics.fillRect(x, y, width, height);
+}
+
+function drawRectangleOutline(x, y, width, height, color) {
+  Graphics.strokeStyle = color;
+  Graphics.strokeRect(x, y, width, height);
+}
 
 function drawAt(x, y, callback) {
   Graphics.save();
