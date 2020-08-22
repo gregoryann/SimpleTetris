@@ -32,7 +32,6 @@ function () {
       this.t++;
 
       if (this.t > 30) {
-        this.level.removeRows(this.rows);
         this.done = true;
       }
     }
