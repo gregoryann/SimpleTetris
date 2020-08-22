@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.loadAssets = loadAssets;
-exports.AllClearSound = exports.TSpinSound = exports.HoldSound = exports.HardDropSound = exports.LineClearSounds = exports.ShiftSound = exports.LockSound = exports.LandSound = exports.RotateSound = exports.Song1 = void 0;
+exports.AllClearSound = exports.TSpinSound = exports.HoldSound = exports.HardDropSound = exports.LineClearSounds = exports.ShiftSound = exports.LockSound = exports.LandSound = exports.RotateSound = exports.Song1 = exports.TextsSprite = exports.Font = void 0;
 
 var _utils = require("./utils");
 
@@ -29,6 +29,8 @@ var _Hold = _interopRequireDefault(require("./Audio/Samples/Hold"));
 var _TSpin = require("./Audio/Samples/TSpin");
 
 var _Song = _interopRequireDefault(require("./Audio/Songs/Song1"));
+
+var _Texts = _interopRequireDefault(require("./Sprites/Texts"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -55,6 +57,23 @@ function createAudioSampleAsset(createSampleFunction) {
   });
 }
 
+function createSpriteAsset(spriteObject) {
+  return new Promise(function (resolve) {
+    var img = new Image();
+
+    img.onload = function () {
+      spriteObject.renderable = img;
+      resolve(spriteObject);
+    };
+
+    img.src = spriteObject.dataUrl;
+  });
+}
+
+var Font;
+exports.Font = Font;
+var TextsSprite;
+exports.TextsSprite = TextsSprite;
 var Song1;
 exports.Song1 = Song1;
 var RotateSound = createAudioSampleAsset(_Rotate.createRotateSound);
@@ -106,22 +125,32 @@ function loadAssets() {
       switch (_context3.prev = _context3.next) {
         case 0:
           _context3.next = 2;
-          return regeneratorRuntime.awrap(Promise.all([ShiftSound, RotateSound, LandSound, LockSound, LineClearSounds[0], LineClearSounds[1], LineClearSounds[2], LineClearSounds[3], HardDropSound, HoldSound, TSpinSound, AllClearSound]));
+          return regeneratorRuntime.awrap(Promise.all([Font, TextsSprite, ShiftSound, RotateSound, LandSound, LockSound, LineClearSounds[0], LineClearSounds[1], LineClearSounds[2], LineClearSounds[3], HardDropSound, HoldSound, TSpinSound, AllClearSound]));
 
         case 2:
           _context3.next = 4;
-          return regeneratorRuntime.awrap(createReverb());
+          return regeneratorRuntime.awrap(createSpriteAsset(FontAsset));
 
         case 4:
-          _context3.next = 6;
+          exports.Font = Font = _context3.sent;
+          _context3.next = 7;
+          return regeneratorRuntime.awrap(createSpriteAsset(_Texts["default"]));
+
+        case 7:
+          exports.TextsSprite = TextsSprite = _context3.sent;
+          _context3.next = 10;
+          return regeneratorRuntime.awrap(createReverb());
+
+        case 10:
+          _context3.next = 12;
           return regeneratorRuntime.awrap((0, _Song["default"])());
 
-        case 6:
+        case 12:
           exports.Song1 = Song1 = _context3.sent;
           Song1.play();
           document.body.classList.remove('loading');
 
-        case 9:
+        case 15:
         case "end":
           return _context3.stop();
       }

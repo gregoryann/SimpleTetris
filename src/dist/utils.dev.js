@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.sign = sign;
 exports.clamp = clamp;
 exports.approach = approach;
+exports.ease = ease;
 exports.overlapping = overlapping;
 exports.manhattanDistance = manhattanDistance;
 exports.distanceSquared = distanceSquared;
@@ -16,11 +17,17 @@ exports.renderSolidSquare = renderSolidSquare;
 exports.makeColorWithAlpha = makeColorWithAlpha;
 exports.waitForNextFrame = waitForNextFrame;
 exports.zeroPad = zeroPad;
-exports.forRectangularRegion = exports.getCellY = exports.getCellX = void 0;
+exports.EnvelopeSampler = exports.forRectangularRegion = exports.getCellY = exports.getCellX = void 0;
 
 var _constants = require("./constants");
 
 var _globals = require("./globals");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
 
@@ -42,6 +49,10 @@ function clamp(x, min, max) {
 
 function approach(x, target, acc) {
   return x > target ? Math.max(x - acc, target) : Math.min(x + acc, target);
+}
+
+function ease(t) {
+  return t * t * (3 - 2 * t);
 }
 
 function overlapping(rect1, rect2) {
@@ -153,10 +164,67 @@ function makeColorWithAlpha(color, alpha) {
   return "".concat(type, "(").concat(args, ",").concat(alpha, ")");
 }
 /**
+ * Animation and audio utils
+ */
+
+
+var EnvelopeSampler =
+/*#__PURE__*/
+function () {
+  function EnvelopeSampler(envelope) {
+    _classCallCheck(this, EnvelopeSampler);
+
+    this.envelope = envelope;
+    this.reset();
+  }
+
+  _createClass(EnvelopeSampler, [{
+    key: "reset",
+    value: function reset() {
+      this.i = 0;
+    }
+  }, {
+    key: "sample",
+    value: function sample(position) {
+      while (this.i < this.envelope.length - 1) {
+        var _this$envelope$this$i = _slicedToArray(this.envelope[this.i], 3),
+            t1 = _this$envelope$this$i[0],
+            v1 = _this$envelope$this$i[1],
+            _this$envelope$this$i2 = _this$envelope$this$i[2],
+            curve = _this$envelope$this$i2 === void 0 ? 1 : _this$envelope$this$i2;
+
+        var _this$envelope = _slicedToArray(this.envelope[this.i + 1], 2),
+            t2 = _this$envelope[0],
+            v2 = _this$envelope[1];
+
+        if (t1 <= position && position < t2) {
+          var t = (position - t1) / (t2 - t1);
+
+          if (curve > 1) {
+            t = Math.pow(t, curve);
+          } else {
+            t = 1 - Math.pow(1 - t, 1 / curve);
+          }
+
+          return v1 + t * (v2 - v1);
+        }
+
+        this.i++;
+      }
+
+      return this.envelope[this.envelope.length - 1][1];
+    }
+  }]);
+
+  return EnvelopeSampler;
+}();
+/**
  * Waiting for the next frame is useful for preventing the browser to hang
  * while the assets are being generated
  */
 
+
+exports.EnvelopeSampler = EnvelopeSampler;
 
 function waitForNextFrame() {
   return regeneratorRuntime.async(function waitForNextFrame$(_context2) {

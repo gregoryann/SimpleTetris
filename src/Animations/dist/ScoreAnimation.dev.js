@@ -3,9 +3,11 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.GameOverAnimation = void 0;
+exports.ScoreAnimation = void 0;
 
-var _ClearAnimation = require("./ClearAnimation");
+var _fontUtils = require("../fontUtils");
+
+var _Graphics = require("../Graphics");
 
 var _Animation = require("./Animation");
 
@@ -21,68 +23,42 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
-function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
-
-function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
-
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var GameOverAnimation =
+var ScoreAnimation =
 /*#__PURE__*/
 function (_AnimationBase) {
-  _inherits(GameOverAnimation, _AnimationBase);
+  _inherits(ScoreAnimation, _AnimationBase);
 
-  function GameOverAnimation(level) {
+  function ScoreAnimation(score) {
     var _this;
 
-    _classCallCheck(this, GameOverAnimation);
+    _classCallCheck(this, ScoreAnimation);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(GameOverAnimation).call(this, 60));
-    _this.level = level;
-    _this.row = 0;
-    _this.clearAnimations = [];
-
-    _this.addAnimation();
-
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(ScoreAnimation).call(this, 30));
+    _this.score = score;
+    _this.x = Math.random() * 60;
     return _this;
   }
 
-  _createClass(GameOverAnimation, [{
-    key: "step",
-    value: function step() {
-      _get(_getPrototypeOf(GameOverAnimation.prototype), "step", this).call(this);
-
-      if (this.t > 2) {
-        if (this.row < this.level.board.height) {
-          this.addAnimation();
-        }
+  _createClass(ScoreAnimation, [{
+    key: "render",
+    value: function render(xOff, yOff) {
+      if (this.done) {
+        return;
       }
 
-      this.clearAnimations.forEach(function (animation) {
-        animation.step();
-      });
-    }
-  }, {
-    key: "addAnimation",
-    value: function addAnimation() {
-      this.t = 0;
-      this.clearAnimations.push(new _ClearAnimation.ClearAnimation(this.level, [this.row]));
-      this.row++;
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      this.clearAnimations.forEach(function (animation) {
-        return animation.render();
-      });
+      _Graphics.Graphics.globalAlpha = 1 - Math.pow(this.relativeT, 2);
+      (0, _fontUtils.drawText)('+' + this.score, xOff + this.x, yOff - this.t / 2, 2);
+      _Graphics.Graphics.globalAlpha = 1;
     }
   }]);
 
-  return GameOverAnimation;
+  return ScoreAnimation;
 }(_Animation.AnimationBase);
 
-exports.GameOverAnimation = GameOverAnimation;
+exports.ScoreAnimation = ScoreAnimation;

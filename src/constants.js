@@ -31,13 +31,18 @@ export const COLORS = [,
 ]
 
 export const TILE_SIZE = 16
-
 export const AUTO_SHIFT_DELAY = 12
 export const AUTO_REPEAT_DELAY = 2
 export const LOCK_DELAY = 30
 export const MAX_LOCK_RESET_COUNT = 14
-
-
-
 export const T_SPIN_MINI = 1
-export const T_SPIN = 2
+export const T_SPIN_MINI_SINGLE = 2
+export const T_SPIN = 3
+export const T_SPIN_SINGLE = 4
+export const T_SPIN_DOUBLE = 5
+export const T_SPIN_TRIPLE = 6
+export const SINGLE_CLEAR = 7
+export const DOUBLE_CLEAR = 8
+export const TRIPLE_CLEAR = 9
+export const TETRIS_CLEAR = 10
+export const ALL_CLEAR = 11

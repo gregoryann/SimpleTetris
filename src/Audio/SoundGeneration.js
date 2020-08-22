@@ -1,4 +1,7 @@
 import { TheAudioContext } from './Context'
+import { EnvelopeSampler } from '../utils'
+export { EnvelopeSampler }
+from '../utils'
 
 
 export function sampleSine(position) {
@@ -24,6 +27,11 @@ export function samplePulse(position, length) {
 export function sampleNoise() {
     return Math.random() * 2 - 1
 }
+
+
+
+
+
 
 export function sampleEnvelope(position, envelope) {
     for (let i = 0; i < envelope.length - 1; i++) {
