@@ -32,9 +32,14 @@ function () {
     _classCallCheck(this, TetrominoController);
 
     this.tetromino = tetromino;
-    this.tetromino.x = 4;
-    this.tetromino.y = 1;
+    this.tetromino.x = level.tileCountX / 2 - 1;
+    this.tetromino.y = level.tileCountY - 2;
     this.level = level;
+
+    while (this.invalidState()) {
+      this.tetromino.move(0, 1);
+    }
+
     this.inputDelayTimer = _Input.Input.getKey(_constants.KEY_LEFT) || _Input.Input.getKey(_constants.KEY_RIGHT) ? 0 : 15;
     this.repeatTimer = 0;
     this.gravity = 1;
@@ -47,33 +52,20 @@ function () {
   _createClass(TetrominoController, [{
     key: "step",
     value: function step() {
-      var dx = _Input.Input.getKey(_constants.KEY_LEFT) ? -1 : _Input.Input.getKey(_constants.KEY_RIGHT) ? 1 : 0;
+      this.actuallyMoved = false;
+      this.handleMovement();
+      this.handleRotation();
 
-      if (dx) {
-        var actuallyMoved = false;
-
-        if (_Input.Input.getKeyDown(_constants.KEY_LEFT) || _Input.Input.getKeyDown(_constants.KEY_RIGHT)) {
-          actuallyMoved = this.move(dx, 0);
-          this.inputDelayTimer = 15;
-        } else {
-          if (this.inputDelayTimer <= 0) {
-            if (this.repeatTimer <= 0) {
-              actuallyMoved = this.move(dx, 0);
-              this.repeatTimer = 2;
-            }
-          }
-        }
-
-        if (actuallyMoved && this.extendedLockTimer < 4) {
-          this.lockTimer = 30;
-          this.extendedLockTimer++;
-        }
-
-        this.inputDelayTimer--;
-        this.repeatTimer--;
+      if (this.actuallyMoved && this.extendedLockTimer < 14) {
+        this.lockTimer = 30;
+        this.extendedLockTimer++;
       }
 
-      this.handleRotation();
+      if (_Input.Input.getKeyDown(_constants.KEY_UP)) {
+        this.drop();
+        return;
+      }
+
       var shouldDrop = false;
 
       if (_Input.Input.getKeyDown(_constants.KEY_DOWN)) {

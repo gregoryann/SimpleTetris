@@ -104,10 +104,10 @@ function () {
     _classCallCheck(this, Level);
 
     this.tileCountX = 10;
-    this.tileCountY = 20;
+    this.tileCountY = 21;
     this.grid = [];
 
-    for (var i = 0; i < this.tileCountY; i++) {
+    for (var i = 0; i < this.tileCountY + 5; i++) {
       this.grid.push(Array(this.tileCountX).fill(0));
     }
 
@@ -123,6 +123,10 @@ function () {
   _createClass(Level, [{
     key: "step",
     value: function step() {
+      if (this.gameOver) {
+        return;
+      }
+
       if (this.clearAnimation) {
         this.clearAnimation.step();
 
@@ -175,6 +179,8 @@ function () {
 
         this.checkState(rows);
       }
+
+      this.updateGhostPosition();
     }
   }, {
     key: "checkState",
@@ -208,14 +214,43 @@ function () {
       }
 
       rowsToClear.sort(function (a, b) {
-        return b - a;
+        return a - b;
       });
 
       if (rowsToClear.length === 0) {
+        if (this.overflows()) {
+          this.gameOver = true;
+          return;
+        }
+
         this.nextTetromino();
       } else {
         this.clearAnimation = new _ClearAnimation.ClearAnimation(this, rowsToClear);
       }
+    }
+  }, {
+    key: "updateGhostPosition",
+    value: function updateGhostPosition() {
+      var positions = this.currentTetromino.getBlockPositions();
+      var maxDeltas = [0, 0, 0, 0];
+
+      for (var i = 0; i < 4; i++) {
+        var _positions$i = _slicedToArray(positions[i], 2),
+            x = _positions$i[0],
+            y = _positions$i[1];
+
+        for (var delta = 0; delta <= y; delta++) {
+          var ghostY = y - delta;
+
+          if (!this.grid[ghostY][x]) {
+            maxDeltas[i] = delta;
+          } else {
+            break;
+          }
+        }
+      }
+
+      this.ghostOffset = -Math.min.apply(Math, maxDeltas);
     }
   }, {
     key: "isFullRow",
@@ -225,16 +260,29 @@ function () {
       });
     }
   }, {
+    key: "overflows",
+    value: function overflows() {
+      for (var i = this.tileCountY; i < this.tileCountY + 3; i++) {
+        if (this.grid[i].some(function (val) {
+          return val;
+        })) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+  }, {
     key: "removeRows",
     value: function removeRows(rows) {
       // Rows are sorted from bottom to top
       var index = 0;
 
-      for (var y = this.tileCountY - 1; y >= 0; y--) {
+      for (var y = 0; y < this.tileCountY; y++) {
         if (y === rows[index]) {
           index++;
         } else {
-          this.grid[y + index] = this.grid[y];
+          this.grid[y - index] = this.grid[y];
         }
       }
 
@@ -377,6 +425,11 @@ function () {
     key: "width",
     get: function get() {
       return _constants.TILE_SIZE * this.tileCountX;
+    }
+  }, {
+    key: "height",
+    get: function get() {
+      return _constants.TILE_SIZE * this.tileCountY;
     }
   }]);
 
