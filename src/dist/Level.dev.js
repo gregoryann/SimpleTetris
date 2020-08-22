@@ -400,7 +400,7 @@ function () {
           this.setBack2Back();
           (0, _globals.addToScore)(600 * (clearedRowsCount + 1) * _globals.currentLevel);
         } else {
-          (0, _globals.addToScore)(400 * clearedRowsCount * _globals.currentLevel);
+          (0, _globals.addToScore)(400 * (clearedRowsCount + 1) * _globals.currentLevel);
         }
 
         this.setMoveType(_constants.T_SPIN + clearedRowsCount);
