@@ -64,6 +64,8 @@ function () {
     this.tileCountX = 10;
     this.tileCountY = 20;
     this.board = new _Board.Board(this.tileCountX, this.tileCountY);
+    this.width = _constants.TILE_SIZE * this.tileCountX;
+    this.height = _constants.TILE_SIZE * this.tileCountY;
     this.tetrominoSource = new _TetrominoSource.TetrominoSource();
     this.heldTetromino = null;
     this.nextTetrominos = Array.from(Array(6), function () {
@@ -74,7 +76,6 @@ function () {
     this.nextTetromino();
     (0, _globals.resetScore)();
     (0, _globals.resetLineClears)();
-    _Graphics.Graphics.font = 'bold 12px monospace';
     this.scoreAnimations = [];
   }
 
@@ -215,11 +216,11 @@ function () {
       _Graphics.Graphics.strokeRect(-16, 0, 48, 170);
 
       (0, _fontUtils.drawText)("LEVEL:", -17, 190);
-      (0, _fontUtils.drawBoldText)("\n".concat((0, _utils.zeroPad)(_globals.currentLevel, 2)), -17, 190);
+      (0, _fontUtils.drawBoldText)("".concat((0, _utils.zeroPad)(_globals.currentLevel, 2)), -17, 197);
       (0, _fontUtils.drawText)("LINES:", -17, 224);
-      (0, _fontUtils.drawBoldText)("\n".concat((0, _utils.zeroPad)(_globals.lineClears, 4)), -17, 224);
+      (0, _fontUtils.drawBoldText)("".concat((0, _utils.zeroPad)(_globals.lineClears, 4)), -17, 231);
       (0, _fontUtils.drawText)("SCORE:", -17, 297);
-      (0, _fontUtils.drawBoldText)("\n".concat((0, _utils.zeroPad)(_globals.currentScore, 9)), -17, 295, 2);
+      (0, _fontUtils.drawBoldText)("".concat((0, _utils.zeroPad)(_globals.currentScore, 9)), -17, 309, 2);
       var _iteratorNormalCompletion3 = true;
       var _didIteratorError3 = false;
       var _iteratorError3 = undefined;
@@ -266,7 +267,7 @@ function () {
       (0, _Graphics.drawAt)(-10, 50, function () {
         if (_this2.clearStreak > 1) {
           (0, _Graphics.drawSprite)(_Assets.TextsSprite, 0, 0, 7);
-          (0, _fontUtils.drawBoldText)("\n".concat(_this2.clearStreak < 10 ? ' ' : '').concat(_this2.clearStreak - 1), -5, 0, 2);
+          (0, _fontUtils.drawBoldText)("".concat(_this2.clearStreak < 10 ? ' ' : '').concat(_this2.clearStreak - 1), -5, 7, 2);
         }
 
         if (_this2.moveTypeAnimation) {
@@ -630,16 +631,6 @@ function () {
       _Graphics.Graphics.fillStyle = '#000';
 
       _Graphics.Graphics.fillRect(x * size + 1, y * size + 1, size - 3, size - 3);
-    }
-  }, {
-    key: "width",
-    get: function get() {
-      return _constants.TILE_SIZE * this.tileCountX;
-    }
-  }, {
-    key: "height",
-    get: function get() {
-      return _constants.TILE_SIZE * this.tileCountY;
     }
   }]);
 

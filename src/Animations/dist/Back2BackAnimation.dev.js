@@ -40,7 +40,7 @@ function (_AnimationBase) {
     _classCallCheck(this, Back2BackAnimation);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(Back2BackAnimation).call(this, 120));
-    _this.scaleSampler = new _utils.EnvelopeSampler([[0.0, 0.0], [0.1, 0.0, 2], [0.2, 1.4, 1.5], [0.3, 1.0], [0.9, 1.0, 2]]);
+    _this.scaleSampler = new _utils.EnvelopeSampler([[0.0, 0.0], [0.1, 0.0, 2], [0.2, 1.3, 1.5], [0.3, 1.0], [0.9, 1.0, 2]]);
     return _this;
   }
 
@@ -52,6 +52,10 @@ function (_AnimationBase) {
       }
 
       (0, _fontUtils.drawTextCentered)('BACK-TO-BACK', 0, 150, this.scaleSampler.sample(this.relativeT));
+      var text = 'BACK-TO-BACK';
+      var scale = this.scaleSampler.sample(this.relativeT);
+      var textWidth = (0, _fontUtils.getTextWidth)(text);
+      (0, _fontUtils.drawText)(text, -textWidth / 2 * scale, 150, scale);
     }
   }]);
 
