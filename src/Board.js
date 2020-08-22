@@ -53,10 +53,16 @@ export class Board {
         }
     }
 
+    removeTetromino(tetromino) {
+        this.tetrominoes.delete(tetromino)
+        for (let [px, py] of tetromino.getBlockPositions()) {
+            this.grid[py][px] = 0
+        }
+    }
+
+
     clearRows(rows) {
         rows.sort((a, b) => a - b)
-
-        this.changeTetrominosToBlocks(rows)
 
         let tetrominosToMove = new Map()
 
@@ -85,14 +91,49 @@ export class Board {
     }
 
     changeTetrominosToBlocks(rows) {
-        for (let y of rows) {
-            for (let x = 0; x < this.width; x++) {
-                const item = this.grid[y][x]
-                if (item instanceof Tetromino) {
-                    this.grid[y][x] = item.getId()
-                    this.tetrominoes.remove(item)
+        getTetrominoesInRows(rows) {
+            let tetrominoes = new Set()
+            for (let y of rows) {
+                for (let x = 0; x < this.width; x++) {
+                    const item = this.grid[y][x]
+                    if (item instanceof Tetromino) {
+                        tetrominoes.add(item)
+
+                    }
                 }
             }
+            return tetrominoes
         }
+
+        changeTetrominosToBlocks(tetrominoes) {
+            for (let tetromino of tetrominoes) {
+                for (let [x, y] of tetromino.getBlockPositions()) {
+                    this.grid[y][x] = tetromino.getId()
+                }
+                this.tetrominoes.delete(tetromino)
+            }
+
+        }
+
+        emptyRow(y) {
+            this.grid[y].fill(0)
+        }
+
+
+        invalidPosition(tetromino) {
+            for (let [x, y] of tetromino.getBlockPositions()) {
+                if (x < 0 || x >= this.width || y < 0) {
+                    return true
+                }
+                if (y >= this.grid.length) {
+                    continue
+                }
+                const item = this.grid[y][x]
+                if (item && item !== tetromino) {
+                    return true
+                }
+            }
+            return false
+        }
+
     }
-}

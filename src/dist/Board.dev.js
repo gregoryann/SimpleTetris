@@ -114,12 +114,42 @@ function () {
       }
     }
   }, {
+    key: "removeTetromino",
+    value: function removeTetromino(tetromino) {
+      this.tetrominoes["delete"](tetromino);
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = tetromino.getBlockPositions()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var _step2$value = _slicedToArray(_step2.value, 2),
+              px = _step2$value[0],
+              py = _step2$value[1];
+
+          this.grid[py][px] = 0;
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2["return"] != null) {
+            _iterator2["return"]();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
+    }
+  }, {
     key: "clearRows",
     value: function clearRows(rows) {
       rows.sort(function (a, b) {
         return a - b;
       });
-      this.changeTetrominosToBlocks(rows);
       var tetrominosToMove = new Map();
       var index = 0;
 
@@ -139,56 +169,17 @@ function () {
         }
       }
 
-      var _iteratorNormalCompletion2 = true;
-      var _didIteratorError2 = false;
-      var _iteratorError2 = undefined;
-
-      try {
-        for (var _iterator2 = tetrominosToMove[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var _step2$value = _slicedToArray(_step2.value, 2),
-              tetromino = _step2$value[0],
-              delta = _step2$value[1];
-
-          tetromino.y -= delta;
-        }
-      } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion2 && _iterator2["return"] != null) {
-            _iterator2["return"]();
-          }
-        } finally {
-          if (_didIteratorError2) {
-            throw _iteratorError2;
-          }
-        }
-      }
-
-      for (var _y = this.height - index; _y < this.height; _y++) {
-        this.grid[_y] = Array(this.width).fill(0);
-      }
-    }
-  }, {
-    key: "changeTetrominosToBlocks",
-    value: function changeTetrominosToBlocks(rows) {
       var _iteratorNormalCompletion3 = true;
       var _didIteratorError3 = false;
       var _iteratorError3 = undefined;
 
       try {
-        for (var _iterator3 = rows[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-          var y = _step3.value;
+        for (var _iterator3 = tetrominosToMove[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var _step3$value = _slicedToArray(_step3.value, 2),
+              tetromino = _step3$value[0],
+              delta = _step3$value[1];
 
-          for (var x = 0; x < this.width; x++) {
-            var item = this.grid[y][x];
-
-            if (item instanceof _Tetromino.Tetromino) {
-              this.grid[y][x] = item.getId();
-              this.tetrominoes.remove(item);
-            }
-          }
+          tetromino.y -= delta;
         }
       } catch (err) {
         _didIteratorError3 = true;
@@ -201,6 +192,45 @@ function () {
         } finally {
           if (_didIteratorError3) {
             throw _iteratorError3;
+          }
+        }
+      }
+
+      for (var _y = this.height - index; _y < this.height; _y++) {
+        this.grid[_y] = Array(this.width).fill(0);
+      }
+    }
+  }, {
+    key: "changeTetrominosToBlocks",
+    value: function changeTetrominosToBlocks(rows) {
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
+
+      try {
+        for (var _iterator4 = rows[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          var y = _step4.value;
+
+          for (var x = 0; x < this.width; x++) {
+            var item = this.grid[y][x];
+
+            if (item instanceof _Tetromino.Tetromino) {
+              this.grid[y][x] = item.getId();
+              this.tetrominoes.remove(item);
+            }
+          }
+        }
+      } catch (err) {
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion4 && _iterator4["return"] != null) {
+            _iterator4["return"]();
+          }
+        } finally {
+          if (_didIteratorError4) {
+            throw _iteratorError4;
           }
         }
       }

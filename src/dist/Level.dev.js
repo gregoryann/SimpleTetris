@@ -39,6 +39,10 @@ var _MoveTypeAnimation = require("./Animations/MoveTypeAnimation");
 
 var _TetrominoSource = require("./TetrominoSource");
 
+var _Tetromino = require("./Tetrominos/Tetromino");
+
+var _ScaredTetrominoController = require("./ScaredTetrominoController");
+
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
@@ -46,6 +50,14 @@ function _nonIterableRest() { throw new TypeError("Invalid attempt to destructur
 function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) { return; } var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -92,15 +104,35 @@ function () {
         this.back2BackAnimation.step();
       }
 
+      if (this.scaredTetrominoController) {
+        this.scaredTetrominoController.step();
+
+        if (this.scaredTetrominoController.done) {
+          this.nextTetromino();
+          this.scaredTetrominoController = null;
+        }
+
+        return;
+      }
+
       var previousScore = _globals.currentScore;
 
       if (this.clearAnimation) {
         this.clearAnimation.step();
 
         if (this.clearAnimation.done) {
-          this.removeRows(this.clearAnimation.rows);
+          var effectedTetrominoes = this.board.getTetrominoesInRows(this.clearAnimation.rows);
+          this.board.changeTetrominosToBlocks(effectedTetrominoes);
+          this.scaredTetrominoController = this.getScaredTetrominoController(this.clearAnimation.rows);
+          this.board.clearRows(this.clearAnimation.rows);
           this.clearAnimation = null;
-          this.nextTetromino();
+
+          if (this.scaredTetrominoController) {
+            this.board.removeTetromino(this.scaredTetrominoController.tetromino);
+            this.currentTetromino = null;
+          } else {
+            this.nextTetromino();
+          }
         }
 
         return;
@@ -188,8 +220,7 @@ function () {
     value: function render() {
       var _this2 = this;
 
-      this.updateGhostPosition(); // So that closure compiler recognizes it as an extern
-
+      // So that closure compiler recognizes it as an extern
       _Graphics.Graphics['resetTransform']();
 
       _Graphics.Graphics.fillStyle = '#000';
@@ -436,8 +467,56 @@ function () {
       }
     }
   }, {
-    key: "updateGhostPosition",
-    value: function updateGhostPosition() {
+    key: "getScaredTetrominoController",
+    value: function getScaredTetrominoController(rows) {
+      var items = new Set();
+
+      for (var x = 0; x < this.tileCountX; x++) {
+        items.add(this.board.getItemAt(x, rows[0] - 1));
+        items.add(this.board.getItemAt(x, rows[rows.length - 1] + 1));
+      }
+
+      var controllers = new Set();
+      var _iteratorNormalCompletion5 = true;
+      var _didIteratorError5 = false;
+      var _iteratorError5 = undefined;
+
+      try {
+        for (var _iterator5 = items[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+          var item = _step5.value;
+
+          if (item instanceof _Tetromino.Tetromino) {
+            var controller = new _ScaredTetrominoController.ScaredTetrominoController(item, this.board);
+
+            if (controller.isFreeableTetromino()) {
+              controllers.add(controller);
+            }
+          }
+        }
+      } catch (err) {
+        _didIteratorError5 = true;
+        _iteratorError5 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion5 && _iterator5["return"] != null) {
+            _iterator5["return"]();
+          }
+        } finally {
+          if (_didIteratorError5) {
+            throw _iteratorError5;
+          }
+        }
+      }
+
+      if (controllers.size > 0) {
+        return _toConsumableArray(controllers)[Math.floor(Math.random() * controllers.size)];
+      } else {
+        return null;
+      }
+    }
+  }, {
+    key: "getGhostOffset",
+    value: function getGhostOffset() {
       var positions = this.currentTetromino.getBlockPositions();
       var maxDeltas = [0, 0, 0, 0];
 
@@ -460,11 +539,6 @@ function () {
       this.ghostOffset = -Math.min.apply(Math, maxDeltas);
     }
   }, {
-    key: "removeRows",
-    value: function removeRows(rows) {
-      this.board.clearRows(rows);
-    }
-  }, {
     key: "renderBoard",
     value: function renderBoard() {
       for (var y = 0; y < this.board.height; y++) {
@@ -477,9 +551,13 @@ function () {
         }
       }
 
-      if (!this.gameOverAnimation) {
-        this.renderGhostTetromino(this.currentTetromino, this.ghostOffset, _constants.TILE_SIZE, this.tileCountY - 1);
+      if (!this.gameOverAnimation && this.currentTetromino) {
+        this.renderGhostTetromino(this.currentTetromino, this.getGhostOffset(), _constants.TILE_SIZE, this.tileCountY - 1);
         this.renderTetromino(this.currentTetromino, _constants.TILE_SIZE, this.tileCountY - 1);
+      }
+
+      if (this.scaredTetrominoController) {
+        this.renderTetromino(this.scaredTetrominoController.tetromino, _constants.TILE_SIZE, this.tileCountY - 1);
       }
 
       if (this.clearAnimation) {
@@ -544,41 +622,6 @@ function () {
     value: function renderTetromino(tetromino, size, bottom) {
       var positions = tetromino.getBlockPositions();
       var color = tetromino.getColor();
-      var _iteratorNormalCompletion5 = true;
-      var _didIteratorError5 = false;
-      var _iteratorError5 = undefined;
-
-      try {
-        for (var _iterator5 = positions[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-          var _step5$value = _slicedToArray(_step5.value, 2),
-              px = _step5$value[0],
-              py = _step5$value[1];
-
-          this.renderBlock(px, bottom - py, color, size);
-        }
-      } catch (err) {
-        _didIteratorError5 = true;
-        _iteratorError5 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion5 && _iterator5["return"] != null) {
-            _iterator5["return"]();
-          }
-        } finally {
-          if (_didIteratorError5) {
-            throw _iteratorError5;
-          }
-        }
-      }
-    }
-  }, {
-    key: "renderGhostTetromino",
-    value: function renderGhostTetromino(tetromino, offset, size, bottom) {
-      var positions = tetromino.getBlockPositions();
-      var color = tetromino.getColor();
-      positions.forEach(function (el) {
-        return el[1] += offset;
-      });
       var _iteratorNormalCompletion6 = true;
       var _didIteratorError6 = false;
       var _iteratorError6 = undefined;
@@ -589,7 +632,7 @@ function () {
               px = _step6$value[0],
               py = _step6$value[1];
 
-          this.renderGhostBlock(px, bottom - py, color, size);
+          this.renderBlock(px, bottom - py, color, size);
         }
       } catch (err) {
         _didIteratorError6 = true;
@@ -602,6 +645,41 @@ function () {
         } finally {
           if (_didIteratorError6) {
             throw _iteratorError6;
+          }
+        }
+      }
+    }
+  }, {
+    key: "renderGhostTetromino",
+    value: function renderGhostTetromino(tetromino, offset, size, bottom) {
+      var positions = tetromino.getBlockPositions();
+      var color = tetromino.getColor();
+      positions.forEach(function (el) {
+        return el[1] += offset;
+      });
+      var _iteratorNormalCompletion7 = true;
+      var _didIteratorError7 = false;
+      var _iteratorError7 = undefined;
+
+      try {
+        for (var _iterator7 = positions[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+          var _step7$value = _slicedToArray(_step7.value, 2),
+              px = _step7$value[0],
+              py = _step7$value[1];
+
+          this.renderGhostBlock(px, bottom - py, color, size);
+        }
+      } catch (err) {
+        _didIteratorError7 = true;
+        _iteratorError7 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion7 && _iterator7["return"] != null) {
+            _iterator7["return"]();
+          }
+        } finally {
+          if (_didIteratorError7) {
+            throw _iteratorError7;
           }
         }
       }
