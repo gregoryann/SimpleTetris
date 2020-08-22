@@ -10,8 +10,10 @@ import {
     AUTO_REPEAT_DELAY,
     MAX_LOCK_RESET_COUNT,
     LOCK_DELAY,
-    ACTION_ROTATE,
-    ACTION_SHIFT
+    ACTION_ROTATE
+
+
+
 } from './constants';
 
 import { TetrominoO } from './Tetrominos/TetrominoO';
@@ -24,14 +26,12 @@ import {
     HardDropSound
 } from './Assets';
 import { addToScore, lineClears } from './globals';
+import { TetrominoControllerBase } from './TetrominoControllerBase';
 
-
-export class TetrominoController {
+export class TetrominoController extends TetrominoControllerBase {
     constructor(tetromino, board) {
-        this.tetromino = tetromino
+        super(tetromino, board)
         this.tetromino.x = board.width / 2 - 1
-        this.tetromino.y = board.height - 2
-        this.board = board
         while (this.invalidState()) {
             this.tetromino.move(0, 1)
         }
@@ -222,17 +222,6 @@ export class TetrominoController {
 
 
 
-
-    move(dx, dy) {
-        this.tetromino.move(dx, dy)
-        if (this.invalidState()) {
-            this.tetromino.move(-dx, -dy)
-            return false
-        }
-        return true
-    }
-
-
     hardDrop() {
         let dropCount = 0
         while (true) {
@@ -254,51 +243,3 @@ export class TetrominoController {
             this.move(0, 1)
         }
     }
-
-    rotateCCW() {
-        const wallKicks = this.tetromino.getWallKicksCCW()
-
-        this.tetromino.rotateCCW()
-
-        for (let wallKick of wallKicks) {
-            this.tetromino.move(wallKick[0], wallKick[1])
-            if (this.validState()) {
-                return true
-            }
-            this.tetromino.move(-wallKick[0], -wallKick[1])
-        }
-
-        this.tetromino.rotateCW()
-        return false
-    }
-
-    rotateCW() {
-        const wallKicks = this.tetromino.getWallKicksCW()
-
-        this.tetromino.rotateCW()
-
-        for (let wallKick of wallKicks) {
-            this.tetromino.move(wallKick[0], wallKick[1])
-            if (this.validState()) {
-                return true
-            }
-            this.tetromino.move(-wallKick[0], -wallKick[1])
-        }
-
-        this.tetromino.rotateCCW()
-        return false
-    }
-
-    invalidState() {
-        for (let [x, y] of this.tetromino.getBlockPositions()) {
-            if (x < 0 || x >= this.level.tileCountX || y < 0 || this.level.grid[y][x]) {
-                return true
-            }
-        }
-        return false
-    }
-
-    validState() {
-        return !this.invalidState()
-    }
-}
