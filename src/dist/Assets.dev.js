@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.loadAssets = loadAssets;
-exports.AllClearSound = exports.TSpinSound = exports.HoldSound = exports.HardDropSound = exports.LineClearSounds = exports.ShiftSound = exports.LockSound = exports.LandSound = exports.RotateSound = void 0;
+exports.AllClearSound = exports.TSpinSound = exports.HoldSound = exports.HardDropSound = exports.LineClearSounds = exports.ShiftSound = exports.LockSound = exports.LandSound = exports.RotateSound = exports.Song1 = void 0;
 
 var _utils = require("./utils");
 
@@ -27,6 +27,8 @@ var _ReverbIR = require("./Audio/Samples/ReverbIR");
 var _Hold = _interopRequireDefault(require("./Audio/Samples/Hold"));
 
 var _TSpin = require("./Audio/Samples/TSpin");
+
+var _Song = _interopRequireDefault(require("./Audio/Songs/Song1"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -53,6 +55,8 @@ function createAudioSampleAsset(createSampleFunction) {
   });
 }
 
+var Song1;
+exports.Song1 = Song1;
 var RotateSound = createAudioSampleAsset(_Rotate.createRotateSound);
 exports.RotateSound = RotateSound;
 var LandSound = createAudioSampleAsset(_Land.createLandSound);
@@ -109,9 +113,15 @@ function loadAssets() {
           return regeneratorRuntime.awrap(createReverb());
 
         case 4:
+          _context3.next = 6;
+          return regeneratorRuntime.awrap((0, _Song["default"])());
+
+        case 6:
+          exports.Song1 = Song1 = _context3.sent;
+          Song1.play();
           document.body.classList.remove('loading');
 
-        case 5:
+        case 9:
         case "end":
           return _context3.stop();
       }

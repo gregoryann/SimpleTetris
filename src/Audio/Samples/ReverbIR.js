@@ -1,4 +1,5 @@
 import { applyEnvelope, generateSound, sampleNoise } from '../SoundGeneration'
+import { applyEnvelope, generateSound, sampleNoise } from '../SoundGeneration';
 
 export default function createSound() {
     const e = 1e-7
