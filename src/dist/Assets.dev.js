@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.loadAssets = loadAssets;
-exports.AllClearSound = exports.TSpinSound = exports.HoldSound = exports.HardDropSound = exports.LineClearSounds = exports.ShiftSound = exports.LockSound = exports.LandSound = exports.RotateSound = exports.Song1 = exports.TextsSprite = exports.Font = void 0;
+exports.AllClearSound = exports.TSpinSound = exports.HoldSound = exports.HardDropSound = exports.LineClearSounds = exports.ShiftSound = exports.LockSound = exports.LandSound = exports.RotateSound = exports.Song1 = exports.EyesSprite = exports.TextsSprite = exports.Font = void 0;
 
 var _utils = require("./utils");
 
@@ -32,7 +32,17 @@ var _Song = _interopRequireDefault(require("./Audio/Songs/Song1"));
 
 var _Texts = _interopRequireDefault(require("./Sprites/Texts"));
 
+var _Eyes = _interopRequireDefault(require("./Sprites/Eyes"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) { return; } var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function createAudioSampleAsset(createSampleFunction) {
   var array, result;
@@ -74,6 +84,8 @@ var Font;
 exports.Font = Font;
 var TextsSprite;
 exports.TextsSprite = TextsSprite;
+var EyesSprite;
+exports.EyesSprite = EyesSprite;
 var Song1;
 exports.Song1 = Song1;
 var RotateSound = createAudioSampleAsset(_Rotate.createRotateSound);
@@ -120,37 +132,38 @@ function createReverb() {
 }
 
 function loadAssets() {
+  var _ref, _ref2;
+
   return regeneratorRuntime.async(function loadAssets$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
         case 0:
           _context3.next = 2;
-          return regeneratorRuntime.awrap(Promise.all([Font, TextsSprite, ShiftSound, RotateSound, LandSound, LockSound, LineClearSounds[0], LineClearSounds[1], LineClearSounds[2], LineClearSounds[3], HardDropSound, HoldSound, TSpinSound, AllClearSound]));
+          return regeneratorRuntime.awrap(Promise.all([ShiftSound, RotateSound, LandSound, LockSound, LineClearSounds[0], LineClearSounds[1], LineClearSounds[2], LineClearSounds[3], HardDropSound, HoldSound, TSpinSound, AllClearSound]));
 
         case 2:
           _context3.next = 4;
-          return regeneratorRuntime.awrap(createSpriteAsset(FontAsset));
+          return regeneratorRuntime.awrap(Promise.all([createSpriteAsset(FontAsset), createSpriteAsset(_Texts["default"]), createSpriteAsset(_Eyes["default"])]));
 
         case 4:
-          exports.Font = Font = _context3.sent;
-          _context3.next = 7;
-          return regeneratorRuntime.awrap(createSpriteAsset(_Texts["default"]));
-
-        case 7:
-          exports.TextsSprite = TextsSprite = _context3.sent;
-          _context3.next = 10;
+          _ref = _context3.sent;
+          _ref2 = _slicedToArray(_ref, 3);
+          exports.Font = Font = _ref2[0];
+          exports.TextsSprite = TextsSprite = _ref2[1];
+          exports.EyesSprite = EyesSprite = _ref2[2];
+          _context3.next = 11;
           return regeneratorRuntime.awrap(createReverb());
 
-        case 10:
-          _context3.next = 12;
+        case 11:
+          _context3.next = 13;
           return regeneratorRuntime.awrap((0, _Song["default"])());
 
-        case 12:
+        case 13:
           exports.Song1 = Song1 = _context3.sent;
           Song1.play();
           document.body.classList.remove('loading');
 
-        case 15:
+        case 16:
         case "end":
           return _context3.stop();
       }

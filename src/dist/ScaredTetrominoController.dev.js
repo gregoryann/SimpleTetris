@@ -52,6 +52,7 @@ function (_TetrominoControllerB) {
     _this.cachedInstructions = [];
     _this.timer = 0;
     _this.cachedInstructionsIndex = 0;
+    _this.timerDuration = Math.max(1, Math.round(_this.tetromino.y / 8));
     return _this;
   }
 
@@ -62,9 +63,11 @@ function (_TetrominoControllerB) {
         return;
       }
 
+      this.tetromino.eyeDirection = [0, -2];
+      this.tetromino.scared = false;
       this.timer++;
 
-      if (this.timer === 3) {
+      if (this.timer === this.timerDuration) {
         this.timer = 0;
         this.escape();
       }
