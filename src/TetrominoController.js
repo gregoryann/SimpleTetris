@@ -1,6 +1,15 @@
 import { Input } from './Input';
 import { KEY_ROTATE_CCW, KEY_LEFT, KEY_RIGHT, KEY_ROTATE_CW, KEY_DOWN, KEY_UP, AUTO_SHIFT_DELAY, AUTO_REPEAT_DELAY, MAX_LOCK_RESET_COUNT, LOCK_DELAY } from './constants';
 import { TetrominoO } from './Tetrominos/TetrominoO';
+import { playSample } from './Audio';
+import {
+    RotateSound,
+    LandSound,
+    LockSound,
+    ShiftSound,
+    HardDropSound
+} from './Assets';
+
 
 export class TetrominoController {
     constructor(tetromino, board) {
@@ -23,18 +32,19 @@ export class TetrominoController {
     }
 
     step() {
-        this.actuallyMoved = false
+        let prevX = this.tetromino.x
+        let prevRotation = this.tetromino.rotation
 
         this.handleMovement()
         this.handleRotation()
 
-        if (this.actuallyMoved && this.lockResetCount < MAX_LOCK_RESET_COUNT) {
+        if ((prevX !== this.tetromino.x || prevRotation !== this.tetromino.rotation) && this.lockResetCount < MAX_LOCK_RESET_COUNT) {
             this.delayLock()
             this.lockResetCount++
         }
 
         if (Input.getKeyDown(KEY_UP)) {
-            this.drop()
+            this.hardDrop()
             return
         }
 
@@ -60,14 +70,15 @@ export class TetrominoController {
 
             this.dropTimer = 60 / this.gravity
         }
-
-        if (dropAmount > 0) {
-            for (let i = 0; i < dropAmount; i++) {
-                this.move(0, -1)
-            }
+        for (let i = 0; i < dropAmount; i++) {
+            this.move(0, -1)
         }
 
-        if (this.onFloor() && this.lockTimer <= 0) {
+        if (manualDrop && dropAmount > 0 && !onFloor) {
+            playSample(ShiftSound)
+        }
+
+        if (onFloor && this.lockTimer <= 0) {
             this.delayLock()
         }
 
@@ -98,12 +109,12 @@ handleMovement() {
     }
 
     if (Input.getKeyDown(KEY_LEFT) || Input.getKeyDown(KEY_RIGHT)) {
-        this.actuallyMoved = this.move(dx, 0)
+        this.move(dx, 0) && playSample(ShiftSound)
         this.inputDelayTimer = AUTO_SHIFT_DELAY
     } else {
         if (this.inputDelayTimer <= 0) {
             if (this.repeatTimer <= 0) {
-                this.actuallyMoved = this.move(dx, 0)
+                this.move(dx, 0) && playSample(ShiftSound)
                 this.repeatTimer = AUTO_REPEAT_DELAY
             }
 
@@ -121,18 +132,20 @@ handleMovement() {
 
 
 handleRotation() {
-    if (this.tetromino instanceof TetrominoO) {
-        return
-    }
+
+    const noActualRotation = this.tetromino instanceof TetrominoO
+
     if (Input.getKeyDown(KEY_ROTATE_CCW)) {
-        this.actuallyMoved = this.rotateCCW() || this.actuallyMoved
+
+        (noActualRotation || this.rotateCCW()) && playSample(RotateSound)
+
     } else if (Input.getKeyDown(KEY_ROTATE_CW)) {
-        this.actuallyMoved = this.rotateCW() || this.actuallyMoved
+
+        (noActualRotation || this.rotateCW()) && playSample(RotateSound)
+
     }
+
 }
-
-
-
 
 move(dx, dy) {
     this.tetromino.move(dx, dy)
@@ -144,7 +157,7 @@ move(dx, dy) {
 }
 
 
-drop() {
+hardDrop() {
     let collided
     do {
         collided = !this.move(0, -1)
