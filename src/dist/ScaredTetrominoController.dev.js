@@ -13,6 +13,8 @@ var _Audio = require("./Audio");
 
 var _Assets = require("./Assets");
 
+var _globals = require("./globals");
+
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -52,7 +54,7 @@ function (_TetrominoControllerB) {
     _this.cachedInstructions = [];
     _this.timer = 0;
     _this.cachedInstructionsIndex = 0;
-    _this.timerDuration = Math.max(1, Math.round(_this.tetromino.y / 8));
+    _this.timerDuration = Math.max(1, Math.round(_this.tetromino.y / 4));
     return _this;
   }
 
@@ -75,6 +77,8 @@ function (_TetrominoControllerB) {
   }, {
     key: "escape",
     value: function escape() {
+      (0, _globals.addToScore)(-_globals.currentLevel * 25);
+
       if (this.cachedInstructionsIndex < this.cachedInstructions.length) {
         switch (this.cachedInstructions[this.cachedInstructionsIndex]) {
           case MOVE_UP:
@@ -107,6 +111,7 @@ function (_TetrominoControllerB) {
       }
 
       if (!this.move(0, 1)) {
+        this.board.putTetromino(this.tetromino);
         this.done = true;
       } else {
         (0, _Audio.playSample)(_Assets.ShiftSound);

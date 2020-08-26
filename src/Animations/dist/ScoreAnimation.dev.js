@@ -47,13 +47,14 @@ function (_AnimationBase) {
 
   _createClass(ScoreAnimation, [{
     key: "render",
-    value: function render(xOff, yOff) {
+    value: function render() {
       if (this.done) {
         return;
       }
 
       _Graphics.Graphics.globalAlpha = 1 - Math.pow(this.relativeT, 2);
-      (0, _fontUtils.drawText)('+' + this.score, xOff + this.x, yOff - this.t / 2, 2);
+      var prefix = this.score > 0 ? '+' : '';
+      (0, _fontUtils.drawText)(prefix + this.score, 20 + this.x, 294 - this.t / 2, 2);
       _Graphics.Graphics.globalAlpha = 1;
     }
   }]);
