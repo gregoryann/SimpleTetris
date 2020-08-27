@@ -16,7 +16,7 @@ import {
 
 } from './constants';
 
-import { TetrominoO } from './Tetrominos/TetrominoO';
+import { TetrominoO } from './Tetrominoes/TetrominoO';
 import { playSample } from './Audio';
 import {
     RotateSound,

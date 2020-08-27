@@ -7,7 +7,7 @@ exports.ScaredTetrominoController = void 0;
 
 var _TetrominoControllerBase = require("./TetrominoControllerBase");
 
-var _TetrominoO = require("./Tetrominos/TetrominoO");
+var _TetrominoO = require("./Tetrominoes/TetrominoO");
 
 var _Audio = require("./Audio");
 

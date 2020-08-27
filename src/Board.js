@@ -1,4 +1,4 @@
-import { Tetromino } from './Tetrominos/Tetromino';
+import { Tetromino } from './Tetrominoes/Tetromino';
 import { COLORS } from './constants';
 
 export class Board {
@@ -68,7 +68,7 @@ removeTetromino(tetromino) {
 clearRows(rows) {
     rows.sort((a, b) => a - b)
 
-    let tetrominosToMove = new Map()
+    let tetrominoesToMove = new Map()
 
     let index = 0
     for (let y = 0; y < this.heightWithMargin; y++) {
@@ -78,14 +78,14 @@ clearRows(rows) {
             for (let x = 0; x < this.width; x++) {
                 const item = this.grid[y][x]
                 if (item instanceof Tetromino) {
-                    tetrominosToMove.set(item, index)
+                    tetrominoesToMove.set(item, index)
                 }
             }
             this.grid[y - index] = this.grid[y]
         }
     }
 
-    for (let [tetromino, delta] of tetrominosToMove) {
+    for (let [tetromino, delta] of tetrominoesToMove) {
         tetromino.y -= delta
     }
 
@@ -94,7 +94,7 @@ clearRows(rows) {
     }
 }
 
-changeTetrominosToBlocks(rows) {
+changeTetrominoesToBlocks(tetrominoes) {
     getTetrominoesInRows(rows) {
         let tetrominoes = new Set()
         for (let y of rows) {
