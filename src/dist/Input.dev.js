@@ -11,8 +11,17 @@ var Input = {
   current: {},
   previous: {},
   gamepad: null,
+  reset: function reset() {
+    Input.current = {};
+    Input.previous = {};
+  },
   isPressed: function isPressed(button) {
     return Input.gamepad.buttons[button].pressed;
+  },
+  getAnyKey: function getAnyKey() {
+    return Object.values(Input.current).some(function (val) {
+      return val;
+    });
   },
   getKey: function getKey(input) {
     return !!Input.current[input];

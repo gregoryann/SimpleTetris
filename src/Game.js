@@ -1,8 +1,12 @@
 import { Input } from './Input'
 import { Level } from './Level'
+import { PauseScreen } from './PauseScreen'
+import { nextScene, setScene } from './globals'
+
 
 export let Game = {
-    scene: new Level(),
+    scene: new PauseScreen(new Level()),
+
 
     start() {
         Game.tick()
@@ -18,5 +22,10 @@ export let Game = {
 
         Input.postUpdate()
         Game.scene.render()
+
+        if (nextScene) {
+            Game.scene = nextScene
+            setScene(null)
+        }
     }
 }

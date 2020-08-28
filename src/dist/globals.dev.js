@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.setScene = setScene;
 exports.resetScore = resetScore;
 exports.addToScore = addToScore;
 exports.resetLineClears = resetLineClears;
@@ -14,6 +15,10 @@ var lineClears = 0;
 exports.lineClears = lineClears;
 var currentLevel = 1;
 exports.currentLevel = currentLevel;
+
+function setScene(scene) {
+  nextScene = scene;
+}
 
 function resetScore() {
   exports.currentScore = currentScore = 0;

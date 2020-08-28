@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.loadAssets = loadAssets;
-exports.AllClearSound = exports.TSpinSound = exports.HoldSound = exports.HardDropSound = exports.LineClearSounds = exports.ShiftSound = exports.LockSound = exports.LandSound = exports.RotateSound = exports.Song1 = exports.EyesSprite = exports.TextsSprite = exports.Font = void 0;
+exports.AllClearSound = exports.TSpinSound = exports.HoldSound = exports.HardDropSound = exports.LineClearSounds = exports.ShiftSound = exports.LockSound = exports.LandSound = exports.RotateSound = exports.Song1 = exports.GamepadSprite = exports.EyesSprite = exports.TextsSprite = exports.Font = void 0;
 
 var _utils = require("./utils");
 
@@ -33,6 +33,8 @@ var _Song = _interopRequireDefault(require("./Audio/Songs/Song1"));
 var _Texts = _interopRequireDefault(require("./Sprites/Texts"));
 
 var _Eyes = _interopRequireDefault(require("./Sprites/Eyes"));
+
+var _Gamepad = _interopRequireDefault(require("./Sprites/Gamepad"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -86,6 +88,8 @@ var TextsSprite;
 exports.TextsSprite = TextsSprite;
 var EyesSprite;
 exports.EyesSprite = EyesSprite;
+var GamepadSprite;
+exports.GamepadSprite = GamepadSprite;
 var Song1;
 exports.Song1 = Song1;
 var RotateSound = createAudioSampleAsset(_Rotate.createRotateSound);
@@ -143,27 +147,28 @@ function loadAssets() {
 
         case 2:
           _context3.next = 4;
-          return regeneratorRuntime.awrap(Promise.all([createSpriteAsset(FontAsset), createSpriteAsset(_Texts["default"]), createSpriteAsset(_Eyes["default"])]));
+          return regeneratorRuntime.awrap(Promise.all([createSpriteAsset(FontAsset), createSpriteAsset(_Texts["default"]), createSpriteAsset(_Eyes["default"]), createSpriteAsset(_Gamepad["default"])]));
 
         case 4:
           _ref = _context3.sent;
-          _ref2 = _slicedToArray(_ref, 3);
+          _ref2 = _slicedToArray(_ref, 4);
           exports.Font = Font = _ref2[0];
           exports.TextsSprite = TextsSprite = _ref2[1];
           exports.EyesSprite = EyesSprite = _ref2[2];
-          _context3.next = 11;
+          exports.GamepadSprite = GamepadSprite = _ref2[3];
+          _context3.next = 12;
           return regeneratorRuntime.awrap(createReverb());
 
-        case 11:
-          _context3.next = 13;
+        case 12:
+          _context3.next = 14;
           return regeneratorRuntime.awrap((0, _Song["default"])());
 
-        case 13:
+        case 14:
           exports.Song1 = Song1 = _context3.sent;
           Song1.play();
           document.body.classList.remove('loading');
 
-        case 16:
+        case 17:
         case "end":
           return _context3.stop();
       }

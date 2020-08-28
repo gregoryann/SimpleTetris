@@ -11,11 +11,22 @@ import {
 export let Input = {
     current: {},
     previous: {},
+
     gamepad: null,
+    reset() {
+        Input.current = {}
+        Input.previous = {}
+    },
+
 
     isPressed(button) {
         return Input.gamepad.buttons[button].pressed
     },
+
+    getAnyKey() {
+        return Object.values(Input.current).some(val => val)
+    },
+
 
     getKey(input) {
         return !!Input.current[input]

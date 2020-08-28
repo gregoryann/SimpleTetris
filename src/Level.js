@@ -167,7 +167,9 @@ export class Level {
                     Graphics.translate((Canvas.width - width) / 2, (Canvas.height - height) / 2)
                     Graphics.strokeStyle = '#fff'
                     Graphics.strokeRect(-1, -1, width + 2, height + 2)
-                    this.renderBoard()
+                    if (!this.paused) {
+                        this.renderBoard()
+                    }
                     Graphics.translate(width + 25, 0)
                     Graphics.strokeRect(-16, -1, 48, 170)
                     drawText(`TIME:`, -17, 27 * 7)
@@ -181,7 +183,9 @@ export class Level {
                     for (let animation of this.scoreAnimations) {
                         animation.render()
                     }
-                    this.renderNextTetrominoes()
+                    if (!this.paused) {
+                        this.renderNextTetrominoes()
+                    }
                     Graphics['resetTransform']()
                     Graphics.translate((Canvas.width - width) / 2 - 40, (Canvas.height - height) / 2 + 10)
                     Graphics.strokeRect(-17, -11, 48, 40)
