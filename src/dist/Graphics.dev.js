@@ -3,8 +3,8 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.drawRectangle = drawRectangle;
-exports.drawRectangleOutline = drawRectangleOutline;
+exports.resetTransform = resetTransform;
+exports.fillAndStrokeRectangle = fillAndStrokeRectangle;
 exports.drawAt = drawAt;
 exports.drawSprite = drawSprite;
 exports.Graphics = exports.Canvas = void 0;
@@ -14,13 +14,13 @@ var Graphics = Canvas.getContext('2d');
 exports.Graphics = Graphics;
 Graphics.imageSmoothingEnabled = false;
 
-function drawRectangle(x, y, width, height, color) {
-  Graphics.fillStyle = color;
-  Graphics.fillRect(x, y, width, height);
+function resetTransform() {
+  // So that closure compiler recognizes it as an extern
+  Graphics['resetTransform']();
 }
 
-function drawRectangleOutline(x, y, width, height, color) {
-  Graphics.strokeStyle = color;
+function fillAndStrokeRectangle(x, y, width, height) {
+  Graphics.fillRect(x, y, width, height);
   Graphics.strokeRect(x, y, width, height);
 }
 

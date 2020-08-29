@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.loadAssets = loadAssets;
-exports.AllClearSound = exports.TSpinSound = exports.HoldSound = exports.HardDropSound = exports.LineClearSounds = exports.ShiftSound = exports.LockSound = exports.LandSound = exports.RotateSound = exports.Song1 = exports.GamepadSprite = exports.EyesSprite = exports.TextsSprite = exports.Font = void 0;
+exports.AllClearSound = exports.TSpinSound = exports.HoldSound = exports.HardDropSound = exports.LineClearSounds = exports.ShiftSound = exports.LockSound = exports.LandSound = exports.RotateSound = exports.Song1 = exports.LogoSprite = exports.GamepadSprite = exports.EyesSprite = exports.TextsSprite = exports.Font = void 0;
 
 var _utils = require("./utils");
 
@@ -35,6 +35,8 @@ var _Texts = _interopRequireDefault(require("./Sprites/Texts"));
 var _Eyes = _interopRequireDefault(require("./Sprites/Eyes"));
 
 var _Gamepad = _interopRequireDefault(require("./Sprites/Gamepad"));
+
+var _Logo = _interopRequireDefault(require("./Sprites/Logo"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -90,6 +92,8 @@ var EyesSprite;
 exports.EyesSprite = EyesSprite;
 var GamepadSprite;
 exports.GamepadSprite = GamepadSprite;
+var LogoSprite;
+exports.LogoSprite = LogoSprite;
 var Song1;
 exports.Song1 = Song1;
 var RotateSound = createAudioSampleAsset(_Rotate.createRotateSound);
@@ -147,7 +151,7 @@ function loadAssets() {
 
         case 2:
           _context3.next = 4;
-          return regeneratorRuntime.awrap(Promise.all([createSpriteAsset(FontAsset), createSpriteAsset(_Texts["default"]), createSpriteAsset(_Eyes["default"]), createSpriteAsset(_Gamepad["default"])]));
+          return regeneratorRuntime.awrap(Promise.all([createSpriteAsset(FontAsset), createSpriteAsset(_Texts["default"]), createSpriteAsset(_Eyes["default"]), createSpriteAsset(_Gamepad["default"]), createSpriteAsset(_Logo["default"])]));
 
         case 4:
           _ref = _context3.sent;

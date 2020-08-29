@@ -42,102 +42,102 @@ export class Board {
         const positions = nextTetromino.getBlockPositions()
 
         for (let [x, y] of positions) {
-            if (this.grid[y][x])
-                return true
-        }
-    }
-
-    return false
-}
-
-putTetromino(tetromino) {
-    this.tetrominoes.add(tetromino)
-    for (let [px, py] of tetromino.getBlockPositions()) {
-        this.grid[py][px] = tetromino
-    }
-}
-
-removeTetromino(tetromino) {
-    this.tetrominoes.delete(tetromino)
-    for (let [px, py] of tetromino.getBlockPositions()) {
-        this.grid[py][px] = 0
-    }
-}
-
-
-clearRows(rows) {
-    rows.sort((a, b) => a - b)
-
-    let tetrominoesToMove = new Map()
-
-    let index = 0
-    for (let y = 0; y < this.heightWithMargin; y++) {
-        if (y === rows[index]) {
-            index++
-        } else {
-            for (let x = 0; x < this.width; x++) {
-                const item = this.grid[y][x]
-                if (item instanceof Tetromino) {
-                    tetrominoesToMove.set(item, index)
-                }
-            }
-            this.grid[y - index] = this.grid[y]
-        }
-    }
-
-    for (let [tetromino, delta] of tetrominoesToMove) {
-        tetromino.y -= delta
-    }
-
-    for (let y = this.heightWithMargin - index; y < this.heightWithMargin; y++) {
-        this.grid[y] = Array(this.width).fill(0)
-    }
-}
-
-changeTetrominoesToBlocks(tetrominoes) {
-    getTetrominoesInRows(rows) {
-        let tetrominoes = new Set()
-        for (let y of rows) {
-            for (let x = 0; x < this.width; x++) {
-                const item = this.grid[y][x]
-                if (item instanceof Tetromino) {
-                    tetrominoes.add(item)
-
-                }
-            }
-        }
-        return tetrominoes
-    }
-
-    changeTetrominosToBlocks(tetrominoes) {
-        for (let tetromino of tetrominoes) {
-            for (let [x, y] of tetromino.getBlockPositions()) {
-                this.grid[y][x] = tetromino.getId()
-            }
-            this.tetrominoes.delete(tetromino)
-        }
-
-    }
-
-    emptyRow(y) {
-        this.grid[y].fill(0)
-    }
-
-
-    invalidPosition(tetromino) {
-        for (let [x, y] of tetromino.getBlockPositions()) {
-            if (x < 0 || x >= this.width || y < 0) {
-                return true
-            }
-            if (y >= this.grid.length) {
-                continue
-            }
-            const item = this.grid[y][x]
-            if (item && item !== tetromino) {
+            if (this.grid[y + this.height][x + this.width / 2 - 1]) {
                 return true
             }
         }
+
         return false
     }
 
-}
+    putTetromino(tetromino) {
+        this.tetrominoes.add(tetromino)
+        for (let [px, py] of tetromino.getBlockPositions()) {
+            this.grid[py][px] = tetromino
+        }
+    }
+
+    removeTetromino(tetromino) {
+        this.tetrominoes.delete(tetromino)
+        for (let [px, py] of tetromino.getBlockPositions()) {
+            this.grid[py][px] = 0
+        }
+    }
+
+
+    clearRows(rows) {
+        rows.sort((a, b) => a - b)
+
+        let tetrominoesToMove = new Map()
+
+        let index = 0
+        for (let y = 0; y < this.heightWithMargin; y++) {
+            if (y === rows[index]) {
+                index++
+            } else {
+                for (let x = 0; x < this.width; x++) {
+                    const item = this.grid[y][x]
+                    if (item instanceof Tetromino) {
+                        tetrominoesToMove.set(item, index)
+                    }
+                }
+                this.grid[y - index] = this.grid[y]
+            }
+        }
+
+        for (let [tetromino, delta] of tetrominoesToMove) {
+            tetromino.y -= delta
+        }
+
+        for (let y = this.heightWithMargin - index; y < this.heightWithMargin; y++) {
+            this.grid[y] = Array(this.width).fill(0)
+        }
+    }
+
+    changeTetrominoesToBlocks(tetrominoes) {
+        getTetrominoesInRows(rows) {
+            let tetrominoes = new Set()
+            for (let y of rows) {
+                for (let x = 0; x < this.width; x++) {
+                    const item = this.grid[y][x]
+                    if (item instanceof Tetromino) {
+                        tetrominoes.add(item)
+
+                    }
+                }
+            }
+            return tetrominoes
+        }
+
+        changeTetrominosToBlocks(tetrominoes) {
+            for (let tetromino of tetrominoes) {
+                for (let [x, y] of tetromino.getBlockPositions()) {
+                    this.grid[y][x] = tetromino.getId()
+                }
+                this.tetrominoes.delete(tetromino)
+            }
+
+        }
+
+        emptyRow(y) {
+            this.grid[y].fill(0)
+        }
+
+
+        invalidPosition(tetromino) {
+            for (let [x, y] of tetromino.getBlockPositions()) {
+                if (x < 0 || x >= this.width || y < 0) {
+                    return true
+                }
+                if (y >= this.grid.length) {
+                    continue
+                }
+                const item = this.grid[y][x]
+                if (item && item !== tetromino) {
+                    return true
+                }
+            }
+            return false
+        }
+
+    }

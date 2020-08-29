@@ -23,6 +23,11 @@ var Input = {
       return val;
     });
   },
+  getNoKeyPress: function getNoKeyPress() {
+    return Object.values(Input.current).every(function (val) {
+      return !val;
+    });
+  },
   getKey: function getKey(input) {
     return !!Input.current[input];
   },
@@ -40,11 +45,11 @@ var Input = {
       Input.current[_constants.KEY_DOWN] = Input.gamepad.axes[1] > 0.3 || Input.isPressed(13);
       Input.current[_constants.KEY_ROTATE_CW] = Input.isPressed(1) || Input.isPressed(3);
       Input.current[_constants.KEY_ROTATE_CCW] = Input.isPressed(0) || Input.isPressed(2);
-      Input.current[_constants.KEY_HOLD] = Input.isPressed(4) || Input.isPressed(5) || Input.isPressed(6) || Input.isPressed(7);
+      Input.current[KEY_HOLD] = Input.isPressed(4) || Input.isPressed(5) || Input.isPressed(6) || Input.isPressed(7);
     }
   },
   postUpdate: function postUpdate() {
-    [_constants.KEY_LEFT, _constants.KEY_RIGHT, _constants.KEY_UP, _constants.KEY_DOWN, _constants.KEY_ROTATE_CCW, _constants.KEY_ROTATE_CW, _constants.KEY_HOLD].forEach(function (key) {
+    [_constants.KEY_LEFT, _constants.KEY_RIGHT, _constants.KEY_UP, _constants.KEY_DOWN, _constants.KEY_ROTATE_CCW, _constants.KEY_ROTATE_CW, KEY_HOLD].forEach(function (key) {
       Input.previous[key] = Input.current[key];
     });
   }

@@ -1,54 +1,66 @@
-import { Graphics, Canvas, drawSprite, drawAt } from "./Graphics";
-import { TetrominoT } from './Tetrominoes/TetrominoT';
-import { TetrominoController } from './TetrominoController';
-import { TILE_SIZE, HOLD, ACTION_ROTATE, T_SPIN_MINI, T_SPIN, ALL_CLEAR, SINGLE_CLEAR } from './constants';
-import { ClearAnimation } from './Animations/ClearAnimation';
-import { Input } from './Input';
-import { Board } from './Board';
-import { GameOverAnimation } from './Animations/GameOverAnimation';
-import { playSample } from './Audio';
-import { LineClearSounds, HoldSound, TSpinSound, AllClearSound, Song1, TextsSprite, EyesSprite } from './Assets';
-import { resetScore, addToScore, currentScore, resetLineClears, addLineClears, currentLevel, lineClears } from './globals';
-import { zeroPad } from './utils';
-import { drawText, drawBoldText } from './fontUtils';
-import { ScoreAnimation } from './Animations/ScoreAnimation';
-import { Back2BackAnimation } from './Animations/Back2BackAnimation';
-import { MoveTypeAnimation } from './Animations/MoveTypeAnimation';
-import { TetrominoSource } from './TetrominoSource';
-import { Tetromino } from './Tetrominoes/Tetromino';
-import { ScaredTetrominoController } from './ScaredTetrominoController';
-import { FallingEyePair } from './Animations/FallingEyePair';
+import { Graphics, Canvas, drawSprite, drawAt, resetTransform, fillAndStrokeRectangle } from "./Graphics"
+import { TetrominoT } from './Tetrominoes/TetrominoT'
+import { TetrominoController } from './TetrominoController'
+import { TILE_SIZE, HOLD, ACTION_ROTATE, T_SPIN_MINI, T_SPIN, ALL_CLEAR, SINGLE_CLEAR, PAUSE, GOAL } from './constants'
+import { ClearAnimation } from './Animations/ClearAnimation'
+import { Input } from './Input'
+import { Board } from './Board'
+import { EndAnimation } from './Animations/EndAnimation'
+import { playSample } from './Audio'
+import { LineClearSounds, HoldSound, TSpinSound, AllClearSound, Song1, TextsSprite, EyesSprite } from './Assets'
+import { resetScore, addToScore, currentScore, resetLineClears, addLineClears, currentLevel, lineClears, setScene } from './globals'
+import { zeroPad } from './utils'
+import { drawText, drawBoldText } from './fontUtils'
+import { ScoreAnimation } from './Animations/ScoreAnimation'
+import { Back2BackAnimation } from './Animations/Back2BackAnimation'
+import { MoveTypeAnimation } from './Animations/MoveTypeAnimation'
+import { TetrominoSource } from './TetrominoSource'
+import { Tetromino } from './Tetrominoes/Tetromino'
+import { ScaredTetrominoController } from './ScaredTetrominoController'
+import { FallingEyePair } from './Animations/FallingEyePair'
+import { PauseScreen } from './PauseScreen';
+import { Background } from './Animations/Background';
 
 export class Level {
     constructor() {
+        Input.reset()
+        resetScore()
+        resetLineClears()
         this.tileCountX = 10
         this.tileCountY = 20
         this.time = 0
         this.board = new Board(this.tileCountX, this.tileCountY)
         this.width = TILE_SIZE * this.tileCountX
         this.height = TILE_SIZE * this.tileCountY
-        this.tetrominoSource = new TetrominoSource()
-        this.heldTetromino = null
-        this.nextTetrominoes = Array.from(Array(6), () => this.tetrominoSource.getNext())
         this.lastClearWasSpecial = false
         this.clearStreak = 0
-
         this.scaredTetrominoControllers = new Set()
-
-        this.renderNextTetrominoes()
-
-        resetScore()
-        resetLineClears()
-
         this.scoreAnimations = []
         this.fallingEyes = new Set()
 
         Graphics.lineWidth = 2
+        this.background = new Background()
+        this.tetrominoSource = new TetrominoSource()
+        this.heldTetromino = null
+        this.nextTetrominoes = Array.from(Array(6), () => this.tetrominoSource.getNext())
+        this.nextTetromino()
     }
 
     step() {
-        if (!this.gameOverAnimation) {
+        if (Input.getKeyDown(PAUSE)) {
+            setScene(new PauseScreen(this))
+            return
+        }
+
+        if (!this.endAnimation) {
             this.time++
+        } else {
+            if (this.endAnimation.done) {
+                if (Input.getAnyKey()) {
+                    setScene(new Level())
+                    return
+                }
+            }
         }
 
         this.updateAnimations()
@@ -94,13 +106,19 @@ export class Level {
             if (this.back2BackAnimation && !this.back2BackAnimation.done) {
                 this.back2BackAnimation.step()
             }
-            if (this.clearAnimation && !this.clearAnimation.done) {
+
+            let clearAnimationRunning = this.clearAnimation && !this.clearAnimation.done
+            this.background.paused = clearAnimationRunning
+            this.background.step()
+
+            if (clearAnimationRunning) {
                 this.clearAnimation.step()
                 return
+
             }
 
-            if (this.gameOverAnimation) {
-                this.gameOverAnimation.step()
+            if (this.endAnimation) {
+                this.endAnimation.step()
             }
 
             for (let animation of this.fallingEyes) {
@@ -123,8 +141,7 @@ export class Level {
                     }
                 }
                 updateControllers() {
-                    let disableControls = this.scaredTetrominoControllers.size > 0 || this.gameOverAnimation
-
+                    let disableControls = this.scaredTetrominoControllers.size > 0 || this.endAnimation
                     if (this.scaredTetrominoControllers.size > 0) {
                         for (let controller of this.scaredTetrominoControllers) {
                             controller.step()
@@ -158,20 +175,25 @@ export class Level {
                     }
                 }
                 render() {
-                    // So that closure compiler recognizes it as an extern
-                    Graphics['resetTransform']()
-                    c Graphics.clearRect(0, 0, Canvas.width, Canvas.height)
+                    resetTransform()
+                    Graphics.clearRect(0, 0, Canvas.width, Canvas.height)
+                    this.background.render()
 
                     const width = TILE_SIZE * this.tileCountX
                     const height = TILE_SIZE * this.tileCountY
                     Graphics.translate((Canvas.width - width) / 2, (Canvas.height - height) / 2)
+
                     Graphics.strokeStyle = '#fff'
-                    Graphics.strokeRect(-1, -1, width + 2, height + 2)
+                    Graphics.fillStyle = '#000'
+                    fillAndStrokeRectangle(-1, -1, width + 2, height + 2)
+
                     if (!this.paused) {
                         this.renderBoard()
                     }
+
                     Graphics.translate(width + 25, 0)
-                    Graphics.strokeRect(-16, -1, 48, 170)
+                    Graphics.fillStyle = '#000'
+                    fillAndStrokeRectangle(-16, -1, 48, 170)
                     drawText(`TIME:`, -17, 27 * 7)
                     drawBoldText(this.getTimeText(), -17, 28 * 7)
                     drawText(`LEVEL:`, -17, 30 * 7)
@@ -186,10 +208,14 @@ export class Level {
                     if (!this.paused) {
                         this.renderNextTetrominoes()
                     }
-                    Graphics['resetTransform']()
+                    resetTransform()
+
                     Graphics.translate((Canvas.width - width) / 2 - 40, (Canvas.height - height) / 2 + 10)
-                    Graphics.strokeRect(-17, -11, 48, 40)
+                    Graphics.fillStyle = '#000'
+                    fillAndStrokeRectangle(-17, -11, 48, 40)
+
                     drawBoldText(`HOLD`, -6, -8)
+
                     if (this.heldTetromino) {
                         if (this.controller.wasHeld) {
                             this.renderGhostTetromino(this.heldTetromino, 0, TILE_SIZE / 2, 2)
@@ -212,6 +238,7 @@ export class Level {
                         }
                     })
                 }
+
                 getTSpin() {
                     if (!(this.currentTetromino instanceof TetrominoT) || this.controller.lastMove !== ACTION_ROTATE) {
                         return false
@@ -347,8 +374,13 @@ export class Level {
                         this.clearStreak = 0
                     }
                 }
+
+
+                endGame() {
+                    this.endAnimation = new EndAnimation(this)
+                }
                 setGameOver() {
-                    this.gameOverAnimation = new GameOverAnimation(this)
+                    this.endAnimation = new EndAnimation(this, true)
                     Song1.stop()
                 }
                 setBack2Back() {
@@ -450,7 +482,7 @@ export class Level {
                         }
                     }
 
-                    if (!this.gameOverAnimation) {
+                    if (!this.endAnimation) {
                         for (let tetromino of this.board.tetrominoes) {
                             this.renderTetrominoEyes(tetromino)
                         }
@@ -469,8 +501,8 @@ export class Level {
                         }
                     }
 
-                    if (this.gameOverAnimation) {
-                        this.gameOverAnimation.render()
+                    if (this.endAnimation) {
+                        this.endAnimation.render()
                     }
 
                     for (let animation of this.fallingEyes) {
@@ -511,6 +543,12 @@ export class Level {
                     this.controller.wasHeld = true
                 }
                 nextTetromino() {
+
+                    if (lineClears >= GOAL) {
+                        this.endGame()
+                        return
+                    }
+
                     this.currentTetromino = this.nextTetrominoes.shift()
                     this.nextTetrominoes.push(this.tetrominoSource.getNext())
                     this.controller = new TetrominoController(this.currentTetromino, this.board)

@@ -2,6 +2,8 @@ import { Input } from './Input'
 import { Level } from './Level'
 import { PauseScreen } from './PauseScreen'
 import { nextScene, setScene } from './globals'
+import { StartScreen } from './StartScreen'
+import { setScene, currentScene } from './globals'
 
 
 export let Game = {
@@ -9,23 +11,20 @@ export let Game = {
 
 
     start() {
+        setScene(new StartScreen(new Level()))
         Game.tick()
     },
 
     tick() {
+
         requestAnimationFrame(Game.tick)
-
-
+        let scene = currentScene
         Input.preUpdate()
+        scene.step()
 
-        Game.scene.step()
 
         Input.postUpdate()
-        Game.scene.render()
+        scene.render()
 
-        if (nextScene) {
-            Game.scene = nextScene
-            setScene(null)
-        }
     }
 }

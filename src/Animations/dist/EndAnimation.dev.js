@@ -3,21 +3,19 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.PauseScreen = void 0;
+exports.EndAnimation = void 0;
 
-var _Input = require("./Input");
+var _ClearAnimation = require("./ClearAnimation");
 
-var _constants = require("./constants");
+var _Animation = require("./Animation");
 
-var _globals = require("./globals");
+var _utils = require("../utils");
 
-var _Overlay2 = require("./Overlay");
+var _fontUtils = require("../fontUtils");
 
-var _fontUtils = require("./fontUtils");
+var _Graphics = require("../Graphics");
 
-var _Graphics = require("./Graphics");
-
-var _Assets = require("./Assets");
+var _Assets = require("../Assets");
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -41,68 +39,75 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var PauseScreen =
+var EndAnimation =
 /*#__PURE__*/
-function (_Overlay) {
-  _inherits(PauseScreen, _Overlay);
+function (_AnimationBase) {
+  _inherits(EndAnimation, _AnimationBase);
 
-  function PauseScreen(scene) {
+  function EndAnimation(level, isGameOver) {
     var _this;
 
-    var firstTime = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+    _classCallCheck(this, EndAnimation);
 
-    _classCallCheck(this, PauseScreen);
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(EndAnimation).call(this, 70));
+    _this.isGameOver = isGameOver;
+    _this.level = level;
+    _this.row = 0;
+    _this.clearAnimations = [];
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(PauseScreen).call(this, scene));
-    _this.firstTime = firstTime;
+    _this.addAnimation();
 
-    _Input.Input.reset();
-
+    _this.scaleSampler = new _utils.EnvelopeSampler([[0.0, 0.0], [0.4, 0.0, 2], [0.45, 2.5, 1.5], [0.5, 2.0]]);
     return _this;
   }
 
-  _createClass(PauseScreen, [{
+  _createClass(EndAnimation, [{
     key: "step",
     value: function step() {
-      if (_Input.Input.getKeyDown(_constants.PAUSE) || this.firstTime && _Input.Input.getAnyKey()) {
-        (0, _globals.setScene)(this.scene);
+      _get(_getPrototypeOf(EndAnimation.prototype), "step", this).call(this);
+
+      if (this.t > 2) {
+        if (this.row < this.level.board.height) {
+          this.addAnimation();
+        }
       }
+
+      this.blinkingTimer++;
+      this.clearAnimations.forEach(function (animation) {
+        animation.step();
+      });
+    }
+  }, {
+    key: "addAnimation",
+    value: function addAnimation() {
+      this.t = 0;
+      this.clearAnimations.push(new _ClearAnimation.ClearAnimation(this.level, [this.row]));
+      this.row++;
     }
   }, {
     key: "render",
     value: function render() {
-      _get(_getPrototypeOf(PauseScreen.prototype), "render", this).call(this);
+      this.clearAnimations.forEach(function (animation) {
+        return animation.render();
+      });
 
-      _Graphics.Graphics.setTransform(1, 0, 0, 1, _Graphics.Canvas.width / 2, 0);
+      if (this.t > 10) {
+        var center = this.level.width / 2;
+        var scale = this.scaleSampler.sample((this.t - 10) / 60);
 
-      _Graphics.Graphics.scale(2, 2);
+        if (!this.isGameOver) {
+          (0, _Graphics.drawSprite)(_Assets.TextsSprite, center, 112, 8, scale, scale);
+        }
 
-      (0, _fontUtils.drawBoldTextCentered)('PAUSED', 0, 30);
-
-      _Graphics.Graphics.scale(0.5, 0.5);
-
-      (0, _fontUtils.drawBoldTextCentered)('INSTRUCTIONS', 0, 100);
-      var descriptionMaxCharCount = 50;
-      (0, _fontUtils.drawText)('MAKE FULL HORIZONTAL LINES WITH THE TETROMINOES.\n' + 'THIS WILL DISINTEGRATE THE TETROMINOES AND PROVIDE\n' + 'YOU POINTS.\n\n' + 'TRY TO AIM FOR AS MANY LINES AT THE SAME TIME, AND\n' + 'TRY OUT SOME TRICKS SUCH AS T-SPINS AS WELL!\n\n' + 'DO NOTE THAT TETROMINOES WILL FLEE BACK UP IF THEY\n' + 'CAN WHEN THEY HAVE SEEN FELLOW NEIGHBOURING TETRO-\n' + 'MINOES DIE AT LEAST TWICE. FLEEING TETROMINOES WILL\n' + 'REDUCE YOUR SCORE, SO TRY TO MURDER AS MUCH AS\n' + 'YOU CAN.\n\n' + 'GOOD LUCK!', -descriptionMaxCharCount * _fontUtils.GLYPH_WIDTH / 2, 118);
-
-      _Graphics.Graphics.setTransform(1, 0, 0, 1, _Graphics.Canvas.width / 2 - 100, 248);
-
-      (0, _fontUtils.drawBoldTextCentered)('KEYBOARD CONTROLS', 0, 0);
-      (0, _fontUtils.drawText)('UN/PAUSE GAME   - ESC\n' + 'HARD DROP       - SPACE\n' + 'SOFT DROP       - ARROW DOWN\n' + 'ROTATE CLOCKW   - ARROW UP/X\n' + 'ROTATE C CLOCKW - CTRL/Z\n' + 'HOLD            - SHIFT/C\n', -83, 18);
-
-      _Graphics.Graphics.setTransform(1, 0, 0, 1, _Graphics.Canvas.width / 2 + 100, 248);
-
-      (0, _fontUtils.drawBoldTextCentered)('GAMEPAD CONTROLS', 0, 0);
-      (0, _Graphics.drawSprite)(_Assets.GamepadSprite, 0, 150 - 128);
-      (0, _fontUtils.drawText)('HOLD', 106 - 118, 143 - 128);
-      (0, _fontUtils.drawText)('HARD\nDROP', 54 - 118, 161 - 128);
-      (0, _fontUtils.drawText)('SOFT\nDROP', 86 - 118, 194 - 128);
-      (0, _fontUtils.drawText)('ROTATE\nC.CLOCKW', 125 - 118, 194 - 128);
-      (0, _fontUtils.drawText)('ROTATE\nCLOCKW', 160 - 118, 164 - 128);
+        if (this.t > 90 && this.t % 60 < 30) {
+          (0, _fontUtils.drawTextCentered)('HOLD ANY BUTTON', center, 160);
+          (0, _fontUtils.drawTextCentered)('TO START A NEW GAME', center, 167);
+        }
+      }
     }
   }]);
 
-  return PauseScreen;
-}(_Overlay2.Overlay);
+  return EndAnimation;
+}(_Animation.AnimationBase);
 
-exports.PauseScreen = PauseScreen;
+exports.EndAnimation = EndAnimation;
