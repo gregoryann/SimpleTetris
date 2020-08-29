@@ -17,7 +17,7 @@ var currentLevel = 1;
 exports.currentLevel = currentLevel;
 
 function setScene(scene) {
-  nextScene = scene;
+  currentScene = scene;
 }
 
 function resetScore() {

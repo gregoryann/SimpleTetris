@@ -14,13 +14,13 @@ var _default = {
   frames: [{
     x: 0,
     y: 0,
-    w: 50,
+    w: 52,
     h: 10,
-    oX: 25,
+    oX: 26,
     oY: 4
   }, // TETRIS
   {
-    x: 51,
+    x: 53,
     y: 0,
     w: 67,
     h: 10,
@@ -28,7 +28,7 @@ var _default = {
     oY: 4
   }, // ALL CLEAR
   {
-    x: 119,
+    x: 121,
     y: 0,
     w: 45,
     h: 10,
@@ -74,7 +74,15 @@ var _default = {
     h: 7,
     oX: 19,
     oY: 3
-  } // COMBO
+  }, // COMBO
+  {
+    x: 167,
+    y: 0,
+    w: 44,
+    h: 10,
+    oX: 22,
+    oY: 4
+  } // FINISH
   ]
 };
 exports["default"] = _default;

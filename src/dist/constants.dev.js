@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ALL_CLEAR = exports.TETRIS_CLEAR = exports.TRIPLE_CLEAR = exports.DOUBLE_CLEAR = exports.SINGLE_CLEAR = exports.T_SPIN_TRIPLE = exports.T_SPIN_DOUBLE = exports.T_SPIN_SINGLE = exports.T_SPIN = exports.T_SPIN_MINI_SINGLE = exports.T_SPIN_MINI = exports.MAX_LOCK_RESET_COUNT = exports.LOCK_DELAY = exports.AUTO_REPEAT_DELAY = exports.AUTO_SHIFT_DELAY = exports.TILE_SIZE = exports.COLORS = exports.TETROMINO_Z = exports.TETROMINO_T = exports.TETROMINO_S = exports.TETROMINO_O = exports.TETROMINO_L = exports.TETROMINO_J = exports.TETROMINO_I = exports.INPUT_MAPPING = exports.HOLD = exports.ROTATE_CW = exports.ROTATE_CCW = exports.SOFT_DROP = exports.HARD_DROP = exports.MOVE_RIGHT = exports.MOVE_LEFT = void 0;
+exports.ALL_CLEAR = exports.TETRIS_CLEAR = exports.TRIPLE_CLEAR = exports.DOUBLE_CLEAR = exports.SINGLE_CLEAR = exports.T_SPIN_TRIPLE = exports.T_SPIN_DOUBLE = exports.T_SPIN_SINGLE = exports.T_SPIN = exports.T_SPIN_MINI_SINGLE = exports.T_SPIN_MINI = exports.MAX_LOCK_RESET_COUNT = exports.LOCK_DELAY = exports.AUTO_REPEAT_DELAY = exports.AUTO_SHIFT_DELAY = exports.GOAL = exports.TILE_SIZE = exports.COLORS = exports.TETROMINO_Z = exports.TETROMINO_T = exports.TETROMINO_S = exports.TETROMINO_O = exports.TETROMINO_L = exports.TETROMINO_J = exports.TETROMINO_I = exports.PAUSE = exports.INPUT_MAPPING = exports.HOLD = exports.ROTATE_CW = exports.ROTATE_CCW = exports.SOFT_DROP = exports.HARD_DROP = exports.MOVE_RIGHT = exports.MOVE_LEFT = void 0;
 // Input
 var MOVE_LEFT = 37; // left
 
@@ -35,6 +35,9 @@ var INPUT_MAPPING = {
 
 };
 exports.INPUT_MAPPING = INPUT_MAPPING;
+var PAUSE = 27; // Esc
+
+exports.PAUSE = PAUSE;
 var TETROMINO_I = 1;
 exports.TETROMINO_I = TETROMINO_I;
 var TETROMINO_J = 2;
@@ -53,6 +56,8 @@ var COLORS = [, '#0ff', '#00f', '#f80', '#ff0', '#0f0', '#909', '#f00'];
 exports.COLORS = COLORS;
 var TILE_SIZE = 16;
 exports.TILE_SIZE = TILE_SIZE;
+var GOAL = 250;
+exports.GOAL = GOAL;
 var AUTO_SHIFT_DELAY = 12;
 exports.AUTO_SHIFT_DELAY = AUTO_SHIFT_DELAY;
 var AUTO_REPEAT_DELAY = 2;

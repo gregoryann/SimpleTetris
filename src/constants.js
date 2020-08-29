@@ -12,6 +12,7 @@ export const INPUT_MAPPING = {
     17: ROTATE_CCW // Ctrl
 }
 
+export const PAUSE = 27 // Esc
 export const TETROMINO_I = 1
 export const TETROMINO_J = 2
 export const TETROMINO_L = 3
@@ -31,6 +32,8 @@ export const COLORS = [,
 ]
 
 export const TILE_SIZE = 16
+
+export const GOAL = 250
 export const AUTO_SHIFT_DELAY = 12
 export const AUTO_REPEAT_DELAY = 2
 export const LOCK_DELAY = 30

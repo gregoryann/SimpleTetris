@@ -3,7 +3,7 @@ export let lineClears = 0
 export let currentLevel = 1
 
 export function setScene(scene) {
-    nextScene = scene
+    currentScene = scene
 }
 
 
