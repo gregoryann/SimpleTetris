@@ -11,42 +11,75 @@ import {
 } from './constants'
 
 export let Input = {
-        current: {},
-        previous: {},
+    current: {},
+    previous: {},
 
-        gamepad: null,
-        reset() {
-            Input.current = {}
-            Input.previous = {}
-        },
+    gamepad: null,
+    gamepadState: {},
 
 
-        isPressed(button) {
-            return Input.gamepad.buttons[button].pressed
-        },
+    reset() {
+        Input.current = {}
+        Input.previous = {}
+    },
 
-        getAnyKey() {
-            return Object.values(Input.current).some(val => val)
-        },
 
-        getNoKeyPress() {
-            return Object.values(Input.current).every(val => !val)
-        },
+    isPressed(button) {
+        return Input.gamepad.buttons[button].pressed
+    },
 
-        getKey(input) {
-            return !!Input.current[input]
-        },
+    getAnyKey() {
+        return Object.values(Input.current).some(val => val)
+    },
 
-        getKeyDown(input) {
-            return !!Input.current[input] && !Input.previous[input]
-        },
+    getNoKeyPress() {
+        return Object.values(Input.current).every(val => !val)
+    },
 
-        getKeyUp(input) {
-            return !Input.current[input] && !!Input.previous[input]
-        },
+    getKey(input) {
+        return !!Input.current[input]
+    },
 
-        preUpdate() {
-            Object.entries(Input.current).forEach(([key, value]) => { Input.previous[key] = value })
+    getKeyDown(input) {
+        return !!Input.current[input] && !Input.previous[input]
+    },
+
+    getKeyUp(input) {
+        return !Input.current[input] && !!Input.previous[input]
+    },
+
+    preUpdate() {
+        if (Input.gamepad) {
+            function update(key, state) {
+                if (state && !Input.gamepadState[key]) {
+                    Input.set(key)
+                    Input.gamepadState[key] = true
+                }
+                if (!state && Input.gamepadState[key]) {
+                    Input.unset(key)
+                    Input.gamepadState[key] = false
+                }
+            }
+            update(MOVE_LEFT, Input.gamepad.axes[0] < -0.3 || Input.isPressed(14))
+            update(MOVE_RIGHT, Input.gamepad.axes[0] > 0.3 || Input.isPressed(15))
+            update(HARD_DROP, Input.gamepad.axes[1] < -0.3 || Input.isPressed(12))
+            update(SOFT_DROP, Input.gamepad.axes[1] > 0.3 || Input.isPressed(13))
+            update(ROTATE_CW, (
+                Input.isPressed(1) ||
+                Input.isPressed(3)
+            ))
+            update(ROTATE_CCW, (
+                Input.isPressed(0) ||
+                Input.isPressed(2)
+            ))
+            update(HOLD, (
+                Input.isPressed(4) ||
+                Input.isPressed(5) ||
+                Input.isPressed(6) ||
+                Input.isPressed(7)
+            ))
+            update(PAUSE, Input.isPressed(8) || Input.isPressed(9) || Input.isPressed(10))
+
         }
     },
 
@@ -60,17 +93,12 @@ document.addEventListener('keydown', ({ repeat, keyCode }) => {
         return
     }
 
-    let target = INPUT_MAPPING[keyCode] || keyCode
-    Input.previous[target] = Input.current[target]
-    Input.current[target] = true
+    Input.set(keyCode)
 }, false)
 
 document.addEventListener('keyup', ({ keyCode }) => {
-    let target = INPUT_MAPPING[keyCode] || keyCode
-    Input.previous[target] = Input.current[target]
-    Input.current[target] = false
+    Input.unset(keyCode)
 }, false)
-
 
 window.addEventListener('gamepadconnected', event => {
     if (!Input.gamepad) {
