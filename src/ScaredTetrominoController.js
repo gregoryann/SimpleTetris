@@ -18,7 +18,10 @@ export class ScaredTetrominoController extends TetrominoControllerBase {
         this.cachedInstructions = []
         this.timer = 0
         this.cachedInstructionsIndex = 0
-        this.timerDuration = Math.max(1, Math.round(this.tetromino.y / 4))
+        this.timerDuration = currentLevel > 5 ? 1 : 2
+
+        this.manouvered = 0
+
     }
 
     step() {
@@ -37,7 +40,7 @@ export class ScaredTetrominoController extends TetrominoControllerBase {
             }
     }
     escape() {
-        addToScore(-currentLevel * 25)
+        addToScore(-currentLevel * 5)
         if (this.cachedInstructionsIndex < this.cachedInstructions.length) {
             switch (this.cachedInstructions[this.cachedInstructionsIndex]) {
                 case MOVE_UP:
@@ -62,12 +65,22 @@ export class ScaredTetrominoController extends TetrominoControllerBase {
                     break
             }
             this.cachedInstructionsIndex++
-        }
-        if (!this.move(0, 1)) {
-            this.board.putTetromino(this.tetromino)
-            this.done = true
+
         } else {
-            playSample(ShiftSound)
+            if (!this.move(0, 1)) {
+                if (this.manouvered > 10) {
+                    this.board.putTetromino(this.tetromino)
+                    this.done = true
+                }
+
+                this.manouvered++
+                    this.cachedInstructionsIndex = 0
+                this.cachedInstructions = this.getInstructionsToGetFree()
+                return
+            } else {
+                playSample(ShiftSound)
+            }
+
         }
         if (this.tetromino.y > this.board.height) {
             this.done = true
@@ -90,40 +103,61 @@ export class ScaredTetrominoController extends TetrominoControllerBase {
         let currentStateX = this.tetromino.x
         let currentStateY = this.tetromino.y
         let currentStateRotation = this.tetromino.rotation
+
         let reset = () => {
             this.tetromino.x = currentStateX
             this.tetromino.y = currentStateY
             this.tetromino.rotation = currentStateRotation
         }
+
         if (this.move(0, 1) && this.move(0, 1)) {
             return instructionHistory + MOVE_UP + MOVE_UP
         }
+
         reset()
+
+        if (this.move(0, 1)) {
+            return instructionHistory + MOVE_UP
+        }
+
         if (this.move(-1, 0)) {
-            if (this.getInstructionsToGetFree(stepsToTry - 1, instructionHistory + MOVE_LEFT)) {
-                return instructionHistory
+            let result = this.getInstructionsToGetFree(stepsToTry - 1, instructionHistory + MOVE_LEFT)
+            if (result) {
+                return result
             }
         }
+
         reset()
         if (this.move(1, 0)) {
-            if (this.getInstructionsToGetFree(stepsToTry - 1, instructionHistory + MOVE_RIGHT)) {
-                return instructionHistory
+            let result = this.getInstructionsToGetFree(stepsToTry - 1, instructionHistory + MOVE_RIGHT)
+            if (result) {
+                return result
             }
         }
+
+
         reset()
         if (!(this.tetromino instanceof TetrominoO)) {
             if (this.rotateCCW()) {
-                if (this.getInstructionsToGetFree(stepsToTry - 1, instructionHistory + ROTATE_CCW)) {
-                    return instructionHistory
+                let result = this.getInstructionsToGetFree(stepsToTry - 1, instructionHistory + ROTATE_CCW)
+                if (result) {
+                    return result
+
                 }
             }
+
             reset()
             if (this.rotateCW()) {
-                if (this.getInstructionsToGetFree(stepsToTry - 1, instructionHistory + ROTATE_CW)) {
-                    return instructionHistory
+                let result = this.getInstructionsToGetFree(stepsToTry - 1, instructionHistory + ROTATE_CW)
+                if (result) {
+                    return result
                 }
             }
             reset()
+
+
+
+
         }
         return ''
     }
