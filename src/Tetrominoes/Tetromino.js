@@ -8,6 +8,7 @@ export class Tetromino {
 
 
         this.scared = false
+        this.fleeing = false
         this.eyesIndex = 0
         this.eyeDirection = [0, 0]
         this.eyeUpdateTimer = 0
