@@ -1,6 +1,5 @@
-import { addNotes, offsetNotes, addOctave } from '../../SongGeneration';
-import createLeadSound from '../../MusicSamples/Lead';
-import { highPassFilter } from '../../SoundGeneration';
+import { addNotes, offsetNotes, addOctave } from '../../SongGeneration'
+import createLeadSound from '../../MusicSamples/Lead'
 
 export function createMainTrack(output, bpm) {
 
@@ -44,5 +43,4 @@ export function createMainTrack(output, bpm) {
         ...offsetNotes(mainNotes, 0.333)
     ], output, createLeadSound, bpm)
 
-    highPassFilter(output, 20)
 }

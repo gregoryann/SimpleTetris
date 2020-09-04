@@ -1,7 +1,7 @@
 import { TheAudioContext, TheAudioDestination, TheReverbDestination } from './Context'
-import { waitForNextFrame } from '../utils'
+import { waitForNextFrame, EnvelopeSampler } from '../utils'
 
-export function addSoundToBuffer(sourceData, targetData, offset) {
+export function addSoundToBuffer(sourceData, targetData, offset, mono = false) {
     if (!Array.isArray(sourceData)) {
         sourceData = [sourceData]
     }
@@ -16,145 +16,176 @@ export function addSoundToBuffer(sourceData, targetData, offset) {
 
         const maxJ = Math.min(offset + sourceDataBuffer.length, targetDataBuffer.length)
         for (let j = offset; j < maxJ; j++) {
-            targetDataBuffer[j] += sourceDataBuffer[j - offset]
+            targetDataBuffer[j] = (
+                mono ?
+                sourceDataBuffer[j - offset] :
+                targetDataBuffer[j] + sourceDataBuffer[j - offset]
+            }
         }
     }
-}
+    export function createTempBuffer(noteCount, bpm) {
+        return new Float32Array(Math.ceil(TheAudioContext.sampleRate * noteCount * 60 / bpm))
+    }
 
-export function addNotes(notes, output, instrument, bpm) {
-    const bufferCache = {}
-    notes.forEach(note => {
-        let key = note.slice(1).join('|')
-        if (!bufferCache[key]) {
-            bufferCache[key] = instrument(getFrequencyForTone(note[1]), ...note.slice(2))
+    export function addNotes(notes, output, instrument, bpm, mono = false) {
+        export function addNotes(notes, output, instrument, bpm) {
+            const bufferCache = {}
+            notes.forEach(note => {
+                let key = note.slice(1).join('|')
+                if (!bufferCache[key]) {
+                    bufferCache[key] = instrument(getFrequencyForTone(note[1]), ...note.slice(2))
+                }
+                addSoundToBuffer(
+                    bufferCache[key],
+                    output,
+                    getOffsetForBeat(note[0], bpm),
+                    mono getOffsetForBeat(note[0], bpm),
+                    mono getOffsetForBeat(note[0], bpm),
+                    mono
+                )
+            })
         }
-        addSoundToBuffer(
-            bufferCache[key],
-            output,
-            getOffsetForBeat(note[0], bpm)
-        )
-    })
-}
 
-export function getOffsetForBeat(n, bpm) {
-    return Math.round(TheAudioContext.sampleRate * n * 60 / bpm)
-}
+        export function getSamplePositionWithinBeat(n, bpm) {
+            let beatDuration = TheAudioContext.sampleRate * 60 / bpm
+            return (n % beatDuration) / beatDuration
+        }
 
-export function getFrequencyForTone(n) {
-    return 440 * Math.pow(2, n / 12)
-}
+        export function getOffsetForBeat(n, bpm) {
+            return Math.round(TheAudioContext.sampleRate * n * 60 / bpm)
+        }
 
-export function repeatNotes(x, length, repeat) {
-    const result = []
-    for (let i = 0; i < repeat; i++) {
-        x.forEach(([b, ...args]) => {
-            result.push([b + length * i, ...args])
+        export function getFrequencyForTone(n) {
+            return 440 * Math.pow(2, n / 12)
+        }
+
+        export function repeatNotes(x, length, repeat) {
+            const result = []
+            for (let i = 0; i < repeat; i++) {
+                x.forEach(([b, ...args]) => {
+                    result.push([b + length * i, ...args])
+                })
+            }
+            return result
+        }
+
+        export function addOctave(notes) {
+            for (let i = 0, l = notes.length; i < l; i++) {
+                let [offset, note, ...rest] = notes[i]
+                notes.push([offset, note + 12, ...rest])
+            }
+            return notes
+        }
+
+        export function zipRhythmAndNotes(rhythm, notes) {
+            return rhythm.map((beat, index) => {
+                return [beat, notes[index]]
+            })
+        }
+
+        export function offsetNotes(notes, amount) {
+            notes.forEach(note => { note[0] += amount })
+            return notes
+        }
+
+        export async function createBuffer(trackFunction, sampleCount, bpm) {
+
+            const buffer = TheAudioContext.createBuffer(1, sampleCount, TheAudioContext.sampleRate)
+            trackFunction(buffer.getChannelData(0), bpm)
+            await waitForNextFrame()
+            return buffer
+        }
+
+        export function applyRepeatingEnvelope(buffer, envelope, bpm) {
+            const sampler = new EnvelopeSampler(envelope)
+            let prevT = 0
+            for (let i = 0; i < buffer.length; i++) {
+                let t = getSamplePositionWithinBeat(i, bpm)
+                if (t < prevT) {
+                    sampler.reset()
+                }
+                buffer[i] *= sampler.sample(t)
+                prevT = t
+            }
+
+            return buffer
+        }
+
+
+        export class Song {
+            constructor(channelConfigs, loop = true) {
+                this.channelConfigs = channelConfigs
+
+                let master = TheAudioContext.createGain()
+                let gainNode = TheAudioContext.createGain()
+                gainNode.gain.value = config.volume
+
+                sourceNode.connect(gainNode)
+                gainNode.connect(master)
+
+                if (config.sendToReverb) {
+                    let gain = TheAudioContext.createGain()
+                    gain.gain.value = config.sendToReverb
+                    gainNode.connect(gain)
+                    gain.connect(TheReverbDestination)
+                }
+
+                return {
+                    buffer: config.buffer,
+                    sourceTarget: gainNode,
+                    volume: config.volume
+                    volumeParam: gainNode.gain
+                }
+            })
+
+        this.loop = loop
+
+        master.connect(TheAudioDestination)
+    }
+
+    stop() {
+        this.channels.forEach(channel => {
+            channel.source.disconnect()
+            channel.source = null
         })
     }
-    return result
-}
 
-export function addOctave(notes) {
-    for (let i = 0, l = notes.length; i < l; i++) {
-        let [offset, note, ...rest] = notes[i]
-        notes.push([offset, note + 12, ...rest])
+
+    fadeOut(time = 1) {
+        this.channels.forEach(channel => {
+            channel.volumeParam.linearRampToValueAtTime(0, TheAudioContext.currentTime + time)
+        })
+
+        setTimeout(() => this.stop(), time * 1000)
     }
-    return notes
-}
 
-export function zipRhythmAndNotes(rhythm, notes) {
-    return rhythm.map((beat, index) => {
-        return [beat, notes[index]]
-    })
-}
+    tapeStop(time = 1) {
+        this.channels.forEach(channel => {
+            channel.source.playbackRate.setValueAtTime(1, TheAudioContext.currentTime)
+            channel.source.playbackRate.linearRampToValueAtTime(0.0001, TheAudioContext.currentTime + time)
+        })
 
-export function offsetNotes(notes, amount) {
-    notes.forEach(note => { note[0] += amount })
-    return notes
-}
+        setTimeout(() => this.stop(), time * 1000)
 
-export async function createBuffer(trackFunction, sampleCount, bpm) {
+    }
+    play() {
+        this.channels.forEach(channel => {
 
-    const buffer = TheAudioContext.createBuffer(1, sampleCount, TheAudioContext.sampleRate)
-    trackFunction(buffer.getChannelData(0), bpm)
-    await waitForNextFrame()
-    return buffer
-}
+            if (channel.source) {
+                channel.source.disconnect()
+            }
 
-export class Song {
-    constructor(channelConfigs, loop = true) {
-        this.channelConfigs = channelConfigs
-
-        let master = TheAudioContext.createGain()
-        let gainNode = TheAudioContext.createGain()
-        gainNode.gain.value = config.volume
-
-        sourceNode.connect(gainNode)
-        gainNode.connect(master)
-
-        if (config.sendToReverb) {
-            let gain = TheAudioContext.createGain()
-            gain.gain.value = config.sendToReverb
-            gainNode.connect(gain)
-            gain.connect(TheReverbDestination)
-        }
-
-        return {
-            buffer: config.buffer,
-            sourceTarget: gainNode,
-            volume: config.volume
-            volumeParam: gainNode.gain
-        }
-    })
-
-this.loop = loop
-
-master.connect(TheAudioDestination)
-}
-
-stop() {
-    this.channels.forEach(channel => {
-        channel.source.disconnect()
-        channel.source = null
-    })
-}
+            const sourceNode = TheAudioContext.createBufferSource()
+            sourceNode.loop = this.loop
+            sourceNode.buffer = channel.buffer
+            sourceNode.connect(channel.sourceTarget)
+            sourceNode.start()
+            channel.source = sourceNode
+            channel.volumeParam.setValueAtTime(channel.volume, TheAudioContext.currentTime)
+            channel.volumeParam.linearRampToValueAtTime(0, TheAudioContext.currentTime + time)
 
 
-fadeOut(time = 1) {
-    this.channels.forEach(channel => {
-        channel.volumeParam.linearRampToValueAtTime(0, TheAudioContext.currentTime + time)
-    })
-
-    setTimeout(() => this.stop(), time * 1000)
-}
-
-tapeStop(time = 1) {
-    this.channels.forEach(channel => {
-        channel.source.playbackRate.setValueAtTime(1, TheAudioContext.currentTime)
-        channel.source.playbackRate.linearRampToValueAtTime(0.0001, TheAudioContext.currentTime + time)
-    })
-
-    setTimeout(() => this.stop(), time * 1000)
-
-}
-play() {
-    this.channels.forEach(channel => {
-
-        if (channel.source) {
-            channel.source.disconnect()
-        }
-
-        const sourceNode = TheAudioContext.createBufferSource()
-        sourceNode.loop = this.loop
-        sourceNode.buffer = channel.buffer
-        sourceNode.connect(channel.sourceTarget)
-        sourceNode.start()
-        channel.source = sourceNode
-        channel.volumeParam.setValueAtTime(channel.volume, TheAudioContext.currentTime)
-        channel.volumeParam.linearRampToValueAtTime(0, TheAudioContext.currentTime + time)
-
-
-    })
-}
+        })
+    }
 
 }
