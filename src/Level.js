@@ -46,6 +46,8 @@ export class Level {
         this.nextTetromino()
 
         this.started = false
+
+        this.allRows = Array.from(Array(this.tileCountY), (val, index) => index)
     }
 
     step() {
@@ -159,7 +161,7 @@ export class Level {
                             }
                         }
                         if (this.scaredTetrominoControllers.size === 0) {
-                            this.nextTetromino()
+                            this.checkState(this.allRows)
                         }
                     }
 
